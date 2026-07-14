@@ -1,0 +1,18 @@
+VENOM v1 ROADMAP
+
+Goal:
+Create a mobile app where users can register, log in, earn coins by completing tasks, and spend coins inside the app.
+
+Modules:
+1. User Authentication
+2. Wallet
+3. Tasks
+4. Rewards
+5. Profile
+6. Admin
+
+Version:
+v0.1
+
+Status:
+Planning

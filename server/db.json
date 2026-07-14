@@ -1,0 +1,26 @@
+{
+  "users": [
+    {
+      "username": "rajveer",
+      "password": "1234",
+      "coins": 100
+    }
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Daily Check-in",
+      "reward": 10
+    },
+    {
+      "id": 2,
+      "title": "Complete Profile",
+      "reward": 20
+    },
+    {
+      "id": 3,
+      "title": "Invite One Friend",
+      "reward": 50
+    }
+  ]
+}
