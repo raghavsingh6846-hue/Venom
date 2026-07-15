@@ -3,49 +3,68 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 export default function Login() {
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
 
   async function login() {
+
     try {
+
       const res = await axios.post(
-        "http://127.0.0.1:3000/wallet",
-        {
-          username: username,
-        }
+        "http://127.0.0.1:3000/auth/login",
+        { username }
       );
 
       if (res.data.success) {
+
+        localStorage.setItem(
+          "venomUser",
+          JSON.stringify(res.data.user)
+        );
+
         navigate("/home");
+
       } else {
-        alert("User Not Found");
+
+        alert(res.data.message);
+
       }
-    } catch (err) {
+
+    } catch {
+
       alert("Server Error");
+
     }
+
   }
 
   return (
-    <div style={{ padding: "30px", textAlign: "center" }}>
+
+    <div style={{ padding:30, textAlign:"center" }}>
+
       <h1>Venom</h1>
 
       <input
         placeholder="Username"
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        style={{ width: "250px", padding: "10px", margin: "10px" }}
+        onChange={(e)=>setUsername(e.target.value)}
       />
 
-      <br />
+      <br /><br />
 
       <button onClick={login}>
         Login
       </button>
 
       <p>
-        <Link to="/register">Register</Link>
+        <Link to="/register">
+          Register
+        </Link>
       </p>
+
     </div>
+
   );
+
 }

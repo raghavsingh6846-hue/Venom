@@ -1,34 +1,31 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import axios from "axios";
 
 export default function Home() {
-  const [coins, setCoins] = useState(0);
 
-  useEffect(() => {
-    axios
-      .post("http://127.0.0.1:3000/wallet", {
-        username: "rajveer",
-      })
-      .then((res) => {
-        if (res.data.success) {
-          setCoins(res.data.coins);
-        }
-      });
-  }, []);
+  const user = JSON.parse(
+    localStorage.getItem("venomUser")
+  );
 
   return (
-    <div style={{ padding: "30px", textAlign: "center" }}>
+
+    <div style={{ padding: 30, textAlign: "center" }}>
+
       <h1>Venom Home</h1>
 
-      <h3>Welcome Rajveer</h3>
-
-      <h2>🪙 Coins : {coins}</h2>
+      <h2>
+        Welcome {user ? user.username : "Guest"}
+      </h2>
 
       <br />
 
       <Link to="/wallet">
         <button>Wallet</button>
+      </Link>
+
+      <br /><br />
+
+      <Link to="/tasks">
+        <button>Tasks</button>
       </Link>
 
       <br /><br />
@@ -42,6 +39,20 @@ export default function Home() {
       <Link to="/leaderboard">
         <button>Leaderboard</button>
       </Link>
+
+      <br /><br />
+
+      <button
+        onClick={() => {
+          localStorage.removeItem("venomUser");
+          window.location.href = "/";
+        }}
+      >
+        Logout
+      </button>
+
     </div>
+
   );
+
 }

@@ -1,34 +1,58 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
 
 export default function Wallet() {
 
-  const [coins, setCoins] = useState(0);
+  const [user, setUser] = useState({
+    username: "",
+    coins: 0,
+    followers: 0,
+    likes: 0
+  });
 
   useEffect(() => {
-    axios.post("http://127.0.0.1:3000/wallet", {
-      username: "rajveer"
-    }).then(res => {
-      if (res.data.success) {
-        setCoins(res.data.coins);
+
+    async function loadWallet() {
+
+      try {
+
+        const res = await axios.post(
+          "http://127.0.0.1:3000/auth/login",
+          {
+            username: "Raj123"
+          }
+        );
+
+        if (res.data.success) {
+          setUser(res.data.user);
+        }
+
+      } catch (err) {
+        alert("Server Error");
       }
-    });
+
+    }
+
+    loadWallet();
+
   }, []);
 
   return (
-    <div style={{padding:"30px",textAlign:"center"}}>
+
+    <div style={{ padding: 30, textAlign: "center" }}>
 
       <h1>Wallet</h1>
 
-      <h2>🪙 {coins} Coins</h2>
+      <h2>{user.username}</h2>
 
-      <br/>
+      <h3>🪙 Coins : {user.coins}</h3>
 
-      <Link to="/home">
-        <button>Back</button>
-      </Link>
+      <h3>❤️ Followers : {user.followers}</h3>
+
+      <h3>👍 Likes : {user.likes}</h3>
 
     </div>
+
   );
+
 }

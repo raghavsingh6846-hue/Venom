@@ -1,40 +1,79 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import axios from "axios";
 
 export default function Campaign() {
+
+  const [title, setTitle] = useState("");
+  const [link, setLink] = useState("");
+  const [reward, setReward] = useState("");
+
+  async function createCampaign() {
+
+    try {
+
+      const res = await axios.post(
+        "http://127.0.0.1:3000/campaign/create",
+        {
+          title,
+          link,
+          reward
+        }
+      );
+
+      if (res.data.success) {
+
+        alert("Campaign Created");
+
+        setTitle("");
+        setLink("");
+        setReward("");
+
+      }
+
+    } catch {
+
+      alert("Server Error");
+
+    }
+
+  }
+
   return (
-    <div style={{padding:"30px",textAlign:"center"}}>
+
+    <div style={{ padding: 30, textAlign: "center" }}>
 
       <h1>Create Campaign</h1>
 
       <input
-        placeholder="Instagram Username"
-        style={{padding:"10px",width:"260px",margin:"10px"}}
+        placeholder="Campaign Title"
+        value={title}
+        onChange={(e)=>setTitle(e.target.value)}
       />
 
-      <br/>
-
-      <select style={{padding:"10px",width:"280px"}}>
-        <option>Follow Campaign (+3 Coins)</option>
-        <option>Like Campaign (+1 Coin)</option>
-      </select>
-
-      <br/><br/>
+      <br /><br />
 
       <input
-        placeholder="Total Coins"
-        style={{padding:"10px",width:"260px"}}
+        placeholder="Instagram Link"
+        value={link}
+        onChange={(e)=>setLink(e.target.value)}
       />
 
-      <br/><br/>
+      <br /><br />
 
-      <button>Create Campaign</button>
+      <input
+        placeholder="Reward Coins"
+        value={reward}
+        onChange={(e)=>setReward(e.target.value)}
+      />
 
-      <br/><br/>
+      <br /><br />
 
-      <Link to="/home">
-        <button>Back</button>
-      </Link>
+      <button onClick={createCampaign}>
+        Create Campaign
+      </button>
 
     </div>
+
   );
+
 }

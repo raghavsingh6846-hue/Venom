@@ -7,6 +7,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", require("./routes/auth"));
+app.use("/wallet", require("./routes/wallet"));
+app.use("/tasks", require("./routes/tasks"));
+app.use("/campaign", require("./routes/campaign"));
+app.use("/leaderboard", require("./routes/leaderboard"));
 
 app.get("/", (req, res) => {
     res.json({
@@ -15,6 +19,8 @@ app.get("/", (req, res) => {
     });
 });
 
-app.listen(3000, () => {
-    console.log("Venom Server Running http://localhost:3000");
+const PORT = 3000;
+
+app.listen(PORT, () => {
+    console.log(`Venom Server Running http://localhost:${PORT}`);
 });

@@ -1,24 +1,82 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 
 export default function Register() {
-  return (
-    <div style={{padding:"30px",textAlign:"center"}}>
-      <h1>Register</h1>
 
-      <input
-        placeholder="Username"
-        style={{width:"250px",padding:"10px",margin:"10px"}}
-      />
+    const navigate = useNavigate();
 
-      <br />
+    const [username, setUsername] = useState("");
 
-      <button style={{padding:"10px 30px"}}>
-        Register
-      </button>
+    async function register() {
 
-      <p>
-        Already have an account? <Link to="/">Login</Link>
-      </p>
-    </div>
-  );
+        if (!username.trim()) {
+            alert("Enter Username");
+            return;
+        }
+
+        try {
+
+            const res = await axios.post(
+                "http://127.0.0.1:3000/auth/register",
+                {
+                    username
+                }
+            );
+
+            if (res.data.success) {
+
+                alert("Registration Successful");
+
+                navigate("/");
+
+            } else {
+
+                alert(res.data.message);
+
+            }
+
+        } catch (err) {
+
+            alert("Server Error");
+
+        }
+
+    }
+
+    return (
+
+        <div style={{ padding: 30, textAlign: "center" }}>
+
+            <h1>Venom Register</h1>
+
+            <input
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                style={{
+                    width: 260,
+                    padding: 10,
+                    marginBottom: 10
+                }}
+            />
+
+            <br />
+
+            <button onClick={register}>
+                Register
+            </button>
+
+            <p>
+
+                <Link to="/">
+                    Login
+                </Link>
+
+            </p>
+
+        </div>
+
+    );
+
 }

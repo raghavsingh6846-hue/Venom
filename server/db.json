@@ -1,0 +1,24 @@
+{
+  "users": [
+    {
+      "id": 1784090725830,
+      "username": "Raj123",
+      "coins": 35,
+      "followers": 0,
+      "likes": 0
+    }
+  ],
+  "campaigns": [],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Follow User",
+      "reward": 3
+    },
+    {
+      "id": 2,
+      "title": "Like Post",
+      "reward": 1
+    }
+  ]
+}

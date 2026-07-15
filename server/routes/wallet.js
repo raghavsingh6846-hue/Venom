@@ -2,11 +2,11 @@ const express = require("express");
 
 const router = express.Router();
 
-router.post("/", (req, res) => {
+router.get("/", (req, res) => {
 
     res.json({
         success: true,
-        coins: 100,
+        coins: 0,
         followers: 0,
         likes: 0
     });
