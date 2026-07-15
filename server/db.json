@@ -3,12 +3,19 @@
     {
       "id": 1784090725830,
       "username": "Raj123",
-      "coins": 35,
+      "coins": 40,
       "followers": 0,
       "likes": 0
     }
   ],
-  "campaigns": [],
+  "campaigns": [
+    {
+      "id": 1784093957809,
+      "title": "",
+      "link": "",
+      "reward": 0
+    }
+  ],
   "tasks": [
     {
       "id": 1,
