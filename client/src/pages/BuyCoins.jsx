@@ -18,6 +18,7 @@ const packages=[
 {name:"320 Coins",price:150}
 ];
 
+
 async function submitRequest(){
 
 if(!selected){
@@ -30,16 +31,44 @@ alert("Upload Payment Screenshot");
 return;
 }
 
-const data={
-username:user.username,
-packageName:selected,
-amount,
-screenshot:screenshot.name
-};
+
+const formData=new FormData();
+
+formData.append(
+"username",
+user.username
+);
+
+formData.append(
+"packageName",
+selected
+);
+
+formData.append(
+"amount",
+amount
+);
+
+formData.append(
+"screenshot",
+screenshot
+);
+
+
 
 try{
 
-const res=await axios.post(`${API}/coins/request`,data);
+
+const res=await axios.post(
+`${API}/coins/request`,
+formData,
+{
+headers:{
+"Content-Type":"multipart/form-data"
+}
+}
+);
+
 
 alert(res.data.message);
 
@@ -47,13 +76,19 @@ setSelected("");
 setAmount("");
 setScreenshot(null);
 
+
+
 }catch(err){
 
+console.log(err);
 alert("Server Error");
 
 }
 
+
 }
+
+
 
 return(
 
@@ -65,18 +100,22 @@ fontFamily:"Arial",
 color:"white"
 }}>
 
+
 <h1 style={{textAlign:"center"}}>
 💎 Buy Coins
 </h1>
 
+
+
 <div style={{
 background:"rgba(255,255,255,.15)",
 padding:"20px",
-borderRadius:"25px",
-backdropFilter:"blur(10px)"
+borderRadius:"25px"
 }}>
 
+
 <h2>Select Package</h2>
+
 
 {
 packages.map((p)=>(
@@ -84,18 +123,39 @@ packages.map((p)=>(
 <button
 key={p.name}
 onClick={()=>{
+
 setSelected(p.name);
 setAmount(p.price);
+
 }}
+
 style={{
+
 width:"100%",
 padding:"16px",
 marginTop:"12px",
 borderRadius:"20px",
 border:"none",
+
+background:
+selected===p.name
+?
+"#111"
+:
+"white",
+
+color:
+selected===p.name
+?
+"white"
+:
+"black",
+
 fontSize:"18px",
 fontWeight:"bold"
+
 }}
+
 >
 
 🪙 {p.name} — ₹{p.price}
@@ -105,82 +165,109 @@ fontWeight:"bold"
 ))
 }
 
+
+
 </div>
 
+
+
+
+
 <div style={{
+
 marginTop:"25px",
 background:"rgba(255,255,255,.15)",
 padding:"20px",
 borderRadius:"25px",
 textAlign:"center"
+
 }}>
 
-<h2>Pay Here</h2>
 
-<img
-src="/qr.png"
-style={{
-width:"230px",
-borderRadius:"20px",
-background:"white",
-padding:"10px"
-}}
-alt=""
-/>
+<h2>
+Pay Using UPI
+</h2>
 
-<h3 style={{marginTop:"15px"}}>
+
+<h3>
 UPI ID
 </h3>
 
+
 <div style={{
+
 background:"white",
 color:"black",
-padding:"12px",
+padding:"15px",
 borderRadius:"15px",
-fontWeight:"bold"
+fontWeight:"bold",
+fontSize:"20px"
+
 }}>
+
 shivansh225@ptyes
+
 </div>
 
-<p style={{marginTop:"15px"}}>
+
+
+<p>
 After Payment Upload Screenshot
 </p>
 
+
 <input
+
 type="file"
+
 accept="image/*"
-onChange={(e)=>setScreenshot(e.target.files[0])}
+
+onChange={(e)=>
+setScreenshot(e.target.files[0])
+}
+
 />
+
 
 <br/><br/>
 
+
 <button
+
 onClick={submitRequest}
+
 style={{
+
 padding:"15px 40px",
-border:"none",
 borderRadius:"25px",
+border:"none",
 fontSize:"18px",
 fontWeight:"bold"
+
 }}
+
 >
 
 Submit Payment
 
 </button>
 
+
 </div>
+
+
 
 <Link to="/home">
 
 <button style={{
+
 marginTop:"25px",
 width:"100%",
 padding:"16px",
 borderRadius:"20px",
 border:"none",
-fontSize:"18px",
 fontWeight:"bold"
+
 }}>
 
 ⬅ Back Home
@@ -189,8 +276,10 @@ fontWeight:"bold"
 
 </Link>
 
+
 </div>
 
 );
+
 
 }
