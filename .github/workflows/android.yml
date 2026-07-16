@@ -1,4 +1,4 @@
-name: Build Venom APK
+/xname: Build Venom APK
 
 on:
   push:
