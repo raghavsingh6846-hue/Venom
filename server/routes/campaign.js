@@ -2,6 +2,7 @@ const express = require("express");
 const fs = require("fs");
 
 const router = express.Router();
+
 const DB = "./db.json";
 
 function loadDB() {
@@ -13,49 +14,67 @@ function saveDB(data) {
 }
 
 router.get("/", (req, res) => {
+
   const db = loadDB();
+
   res.json({
     success: true,
-    campaigns: db.campaigns
+    campaigns: db.campaigns.filter(c => c.status === "Active")
   });
+
 });
 
 router.post("/create", (req, res) => {
 
   const {
-    title,
     username,
+    type,
     link,
-    reward,
-    target,
-    createdBy
+    quantity,
+    commentText
   } = req.body;
-
-  if (
-    !title ||
-    !username ||
-    !link ||
-    !reward ||
-    !target
-  ) {
-    return res.json({
-      success: false,
-      message: "Fill all fields"
-    });
-  }
 
   const db = loadDB();
 
+  const user = db.users.find(
+    u => u.username === username
+  );
+
+  if (!user) {
+    return res.json({
+      success: false,
+      message: "User Not Found"
+    });
+  }
+
+  let reward = 0;
+
+  if (type === "Like") reward = 1;
+  if (type === "Follow") reward = 2;
+  if (type === "Comment") reward = 3;
+
+  const totalCoins = reward * Number(quantity);
+
+  if (user.coins < totalCoins) {
+    return res.json({
+      success: false,
+      message: "Insufficient Coins"
+    });
+  }
+
+  user.coins -= totalCoins;
+
   const campaign = {
     id: Date.now(),
-    title,
     username,
+    type,
+    title: type + " Task",
     link,
-    reward: Number(reward),
-    target: Number(target),
-    status: "Active",
-    createdBy,
-    createdAt: new Date().toLocaleString()
+    reward,
+    quantity: Number(quantity),
+    commentText: commentText || "",
+    completed: [],
+    status: "Active"
   };
 
   db.campaigns.push(campaign);
@@ -64,7 +83,8 @@ router.post("/create", (req, res) => {
 
   res.json({
     success: true,
-    campaign
+    campaign,
+    coins: user.coins
   });
 
 });

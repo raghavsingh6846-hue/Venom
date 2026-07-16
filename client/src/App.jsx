@@ -7,6 +7,7 @@ import Wallet from "./pages/Wallet";
 import Campaign from "./pages/Campaign";
 import Leaderboard from "./pages/Leaderboard";
 import Tasks from "./pages/Tasks";
+import Admin from "./pages/Admin";
 
 export default function App() {
 
@@ -17,20 +18,14 @@ export default function App() {
       <Routes>
 
         <Route path="/" element={<Login />} />
-
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
-
         <Route path="/home" element={<Home />} />
-
         <Route path="/wallet" element={<Wallet />} />
-
         <Route path="/tasks" element={<Tasks />} />
-
         <Route path="/campaign" element={<Campaign />} />
-
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/admin" element={<Admin />} />
 
       </Routes>
 

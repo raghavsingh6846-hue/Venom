@@ -1,23 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Tasks() {
 
-  const [coins, setCoins] = useState(0);
+  const loginUser = JSON.parse(localStorage.getItem("venomUser"));
 
-  async function followTask() {
+  const [campaigns, setCampaigns] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState({});
+
+  useEffect(() => {
+    loadCampaigns();
+  }, []);
+
+  async function loadCampaigns() {
 
     try {
 
-      const res = await axios.post(
-        "http://127.0.0.1:3000/tasks/follow",
+      const res = await axios.get(
+        "http://127.0.0.1:3000/tasks",
         {
-          username: "Raj123"
+          params: {
+            username: loginUser.username
+          }
         }
       );
 
       if (res.data.success) {
-        setCoins(res.data.coins);
+        setCampaigns(res.data.tasks);
       }
 
     } catch {
@@ -28,24 +37,40 @@ export default function Tasks() {
 
   }
 
-  async function likeTask() {
+  async function uploadProof(campaignId) {
+
+    const file = selectedFiles[campaignId];
+
+    if (!file) {
+      alert("Please Select Screenshot");
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("username", loginUser.username);
+    formData.append("campaignId", campaignId);
+    formData.append("screenshot", file);
 
     try {
 
       const res = await axios.post(
-        "http://127.0.0.1:3000/tasks/like",
+        "http://127.0.0.1:3000/proof/upload",
+        formData,
         {
-          username: "Raj123"
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
         }
       );
 
-      if (res.data.success) {
-        setCoins(res.data.coins);
-      }
+      alert(res.data.message);
+
+      loadCampaigns();
 
     } catch {
 
-      alert("Server Error");
+      alert("Upload Failed");
 
     }
 
@@ -53,23 +78,76 @@ export default function Tasks() {
 
   return (
 
-    <div style={{ padding: 30, textAlign: "center" }}>
+    <div style={{ padding:30 }}>
 
       <h1>Tasks</h1>
 
-      <h2>Coins : {coins}</h2>
+      {campaigns.length === 0 ? (
 
-      <br />
+        <h3>No Task Available</h3>
 
-      <button onClick={followTask}>
-        Follow User (+3)
-      </button>
+      ) : (
 
-      <br /><br />
+        campaigns.map((c)=>(
 
-      <button onClick={likeTask}>
-        Like Post (+1)
-      </button>
+          <div
+            key={c.id}
+            style={{
+              border:"1px solid gray",
+              borderRadius:"10px",
+              padding:"15px",
+              marginBottom:"20px"
+            }}
+          >
+
+            <h3>{c.type}</h3>
+
+            <p>👤 {c.username}</p>
+
+            <p>🪙 Reward : {c.reward} Coins</p>
+
+            <p>📦 Remaining : {c.quantity}</p>
+
+            {c.type === "Comment" && (
+              <p>💬 {c.commentText}</p>
+            )}
+
+            <a
+              href={c.link}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <button>
+                Open Instagram
+              </button>
+            </a>
+
+            <br /><br />
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e)=>
+                setSelectedFiles({
+                  ...selectedFiles,
+                  [c.id]: e.target.files[0]
+                })
+              }
+            />
+
+            <br /><br />
+
+            <button
+              onClick={()=>uploadProof(c.id)}
+            >
+              Upload Proof
+            </button>
+
+          </div>
+
+        ))
+
+      )}
 
     </div>
 

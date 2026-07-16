@@ -9,62 +9,87 @@ function loadDB() {
   return JSON.parse(fs.readFileSync(DB, "utf8"));
 }
 
-function saveDB(data) {
-  fs.writeFileSync(DB, JSON.stringify(data, null, 2));
-}
+router.get("/", (req, res) => {
 
-router.post("/follow", (req, res) => {
-
-  const { username } = req.body;
+  const username = req.query.username;
 
   const db = loadDB();
 
-  const user = db.users.find(
-    u => u.username === username
-  );
+  const tasks = db.campaigns.filter(c => {
 
-  if (!user) {
-    return res.json({
-      success: false,
-      message: "User Not Found"
-    });
-  }
+    if (c.status !== "Active") return false;
 
-  user.coins += 3;
+    if (!username) return true;
 
-  saveDB(db);
+    if (c.username === username) return false;
+
+    const completed = c.completed || [];
+
+    if (completed.includes(username)) {
+      return false;
+    }
+
+    const proofs = db.proofs || [];
+
+    const pending = proofs.find(p =>
+      p.username === username &&
+      p.campaignId == c.id &&
+      (p.status === "Pending" || p.status === "Approved")
+    );
+
+    if (pending) {
+      return false;
+    }
+
+    return true;
+
+  });
 
   res.json({
     success: true,
-    coins: user.coins
+    tasks
   });
 
 });
 
-router.post("/like", (req, res) => {
+router.post("/complete", (req, res) => {
 
-  const { username } = req.body;
+  const { username, campaignId } = req.body;
 
   const db = loadDB();
 
-  const user = db.users.find(
-    u => u.username === username
+  const campaign = db.campaigns.find(
+    c => c.id == campaignId
   );
 
-  if (!user) {
+  if (!campaign) {
     return res.json({
       success: false,
-      message: "User Not Found"
+      message: "Campaign Not Found"
     });
   }
 
-  user.coins += 1;
+  if (!campaign.completed) {
+    campaign.completed = [];
+  }
 
-  saveDB(db);
+  if (campaign.completed.includes(username)) {
+    return res.json({
+      success: false,
+      message: "Already Completed"
+    });
+  }
+
+  campaign.completed.push(username);
+
+  fs.writeFileSync(
+    DB,
+    JSON.stringify(db, null, 2)
+  );
 
   res.json({
     success: true,
-    coins: user.coins
+    message: "Task Completed"
   });
 
 });

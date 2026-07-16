@@ -3,6 +3,8 @@ import axios from "axios";
 
 export default function Wallet() {
 
+  const loginUser = JSON.parse(localStorage.getItem("venomUser"));
+
   const [user, setUser] = useState({
     username: "",
     coins: 0,
@@ -10,36 +12,43 @@ export default function Wallet() {
     likes: 0
   });
 
-  useEffect(() => {
+  async function loadWallet() {
 
-    async function loadWallet() {
+    try {
 
-      try {
+      const res = await axios.post(
+        "http://127.0.0.1:3000/auth/login",
+        {
+          username: loginUser.username
+        }
+      );
 
-        const res = await axios.post(
-          "http://127.0.0.1:3000/auth/login",
-          {
-            username: "Raj123"
-          }
+      if (res.data.success) {
+
+        setUser(res.data.user);
+
+        localStorage.setItem(
+          "venomUser",
+          JSON.stringify(res.data.user)
         );
 
-        if (res.data.success) {
-          setUser(res.data.user);
-        }
-
-      } catch (err) {
-        alert("Server Error");
       }
+
+    } catch {
+
+      alert("Server Error");
 
     }
 
-    loadWallet();
+  }
 
+  useEffect(() => {
+    loadWallet();
   }, []);
 
   return (
 
-    <div style={{ padding: 30, textAlign: "center" }}>
+    <div style={{ padding:30, textAlign:"center" }}>
 
       <h1>Wallet</h1>
 
@@ -50,6 +59,12 @@ export default function Wallet() {
       <h3>❤️ Followers : {user.followers}</h3>
 
       <h3>👍 Likes : {user.likes}</h3>
+
+      <br />
+
+      <button onClick={loadWallet}>
+        Refresh Wallet
+      </button>
 
     </div>
 

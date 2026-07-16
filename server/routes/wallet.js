@@ -1,15 +1,35 @@
 const express = require("express");
+const fs = require("fs");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
+const DB = "./db.json";
 
-    res.json({
-        success: true,
-        coins: 0,
-        followers: 0,
-        likes: 0
+function loadDB() {
+  return JSON.parse(fs.readFileSync(DB, "utf8"));
+}
+
+router.post("/", (req, res) => {
+
+  const { username } = req.body;
+
+  const db = loadDB();
+
+  const user = db.users.find(
+    u => u.username === username
+  );
+
+  if (!user) {
+    return res.json({
+      success: false,
+      message: "User Not Found"
     });
+  }
+
+  res.json({
+    success: true,
+    user
+  });
 
 });
 

@@ -3,9 +3,12 @@ import axios from "axios";
 
 export default function Campaign() {
 
-  const [title, setTitle] = useState("");
+  const loginUser = JSON.parse(localStorage.getItem("venomUser"));
+
+  const [type, setType] = useState("Follow");
   const [link, setLink] = useState("");
-  const [reward, setReward] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [commentText, setCommentText] = useState("");
 
   async function createCampaign() {
 
@@ -14,9 +17,11 @@ export default function Campaign() {
       const res = await axios.post(
         "http://127.0.0.1:3000/campaign/create",
         {
-          title,
+          username: loginUser.username,
+          type,
           link,
-          reward
+          quantity,
+          commentText
         }
       );
 
@@ -24,9 +29,14 @@ export default function Campaign() {
 
         alert("Campaign Created");
 
-        setTitle("");
+        setType("Follow");
         setLink("");
-        setReward("");
+        setQuantity("");
+        setCommentText("");
+
+      } else {
+
+        alert(res.data.message);
 
       }
 
@@ -40,15 +50,18 @@ export default function Campaign() {
 
   return (
 
-    <div style={{ padding: 30, textAlign: "center" }}>
+    <div style={{ padding:30, textAlign:"center" }}>
 
-      <h1>Create Campaign</h1>
+      <h1>Create Order</h1>
 
-      <input
-        placeholder="Campaign Title"
-        value={title}
-        onChange={(e)=>setTitle(e.target.value)}
-      />
+      <select
+        value={type}
+        onChange={(e)=>setType(e.target.value)}
+      >
+        <option>Follow</option>
+        <option>Like</option>
+        <option>Comment</option>
+      </select>
 
       <br /><br />
 
@@ -61,15 +74,27 @@ export default function Campaign() {
       <br /><br />
 
       <input
-        placeholder="Reward Coins"
-        value={reward}
-        onChange={(e)=>setReward(e.target.value)}
+        type="number"
+        placeholder="Quantity"
+        value={quantity}
+        onChange={(e)=>setQuantity(e.target.value)}
       />
 
       <br /><br />
 
+      {type === "Comment" && (
+        <>
+          <textarea
+            placeholder="Comment Text"
+            value={commentText}
+            onChange={(e)=>setCommentText(e.target.value)}
+          />
+          <br /><br />
+        </>
+      )}
+
       <button onClick={createCampaign}>
-        Create Campaign
+        Create Order
       </button>
 
     </div>
