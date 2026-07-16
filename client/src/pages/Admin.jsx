@@ -3,53 +3,33 @@ import axios from "axios";
 
 const API = "https://venom-server-5dey.onrender.com";
 
-export default function Admin() {
 
-  const [proofs, setProofs] = useState([]);
+export default function Admin(){
 
-  useEffect(() => {
+  const [proofs,setProofs]=useState([]);
+  const [coinRequests,setCoinRequests]=useState([]);
+
+
+
+  useEffect(()=>{
+
     loadProofs();
-  }, []);
+    loadCoins();
+
+  },[]);
 
 
-  async function loadProofs() {
-
-    try {
-
-      const res = await axios.get(
-        `${API}/admin/proofs`
-      );
-
-      if(res.data.success){
-        setProofs(res.data.proofs);
-      }
-
-    } catch(err){
-
-      console.log(err);
-      alert("Server Error");
-
-    }
-
-  }
 
 
-  async function approve(proofId){
+  async function loadProofs(){
 
-    try{
+    const res=await axios.get(
+      `${API}/admin/proofs`
+    );
 
-      const res = await axios.post(
-        `${API}/admin/approve`,
-        {proofId}
-      );
+    if(res.data.success){
 
-      alert(res.data.message);
-      loadProofs();
-
-    }catch(err){
-
-      console.log(err);
-      alert("Server Error");
+      setProofs(res.data.proofs);
 
     }
 
@@ -57,22 +37,53 @@ export default function Admin() {
 
 
 
-  async function reject(proofId){
 
-    try{
 
-      const res = await axios.post(
-        `${API}/admin/reject`,
-        {proofId}
+  async function approve(id){
+
+    const res=await axios.post(
+      `${API}/admin/approve`,
+      {proofId:id}
+    );
+
+    alert(res.data.message);
+
+    loadProofs();
+
+  }
+
+
+
+
+  async function reject(id){
+
+    const res=await axios.post(
+      `${API}/admin/reject`,
+      {proofId:id}
+    );
+
+    alert(res.data.message);
+
+    loadProofs();
+
+  }
+
+
+
+
+
+  async function loadCoins(){
+
+    const res=await axios.get(
+      `${API}/admin/coin-requests`
+    );
+
+
+    if(res.data.success){
+
+      setCoinRequests(
+        res.data.requests
       );
-
-      alert(res.data.message);
-      loadProofs();
-
-    }catch(err){
-
-      console.log(err);
-      alert("Server Error");
 
     }
 
@@ -80,167 +91,255 @@ export default function Admin() {
 
 
 
-  return (
-
-    <div
-      style={{
-        minHeight:"100vh",
-        padding:"25px",
-        background:"linear-gradient(135deg,#141e30,#243b55)",
-        fontFamily:"Arial"
-      }}
-    >
 
 
-      <h1
-        style={{
-          color:"white",
-          textAlign:"center"
-        }}
-      >
-        🔐 Admin Panel
-      </h1>
+  async function coinApprove(id){
+
+    const res=await axios.post(
+      `${API}/admin/coin-approve`,
+      {id}
+    );
+
+
+    alert(res.data.message);
+
+    loadCoins();
+
+  }
 
 
 
-      {
-        proofs.length===0 ? (
-
-          <h3
-            style={{
-              color:"white",
-              textAlign:"center"
-            }}
-          >
-            No Pending Proof
-          </h3>
 
 
-        ) : (
+  async function coinReject(id){
+
+    const res=await axios.post(
+      `${API}/admin/coin-reject`,
+      {id}
+    );
 
 
-          proofs.map((p)=>(
+    alert(res.data.message);
 
+    loadCoins();
 
-            <div
-              key={p.id}
-              style={card}
-            >
-
-
-              <h2>
-                👤 {p.username}
-              </h2>
-
-
-              <p>
-                Campaign ID : {p.campaignId}
-              </p>
-
-
-              <p>
-                Status : {p.status}
-              </p>
-
-
-              <p>
-                ⭐ Trust Score : {p.trustScore}
-              </p>
+  }
 
 
 
-              <img
-                src={`${API}/uploads/${p.screenshot}`}
-                alt=""
-                style={{
-                  width:"100%",
-                  borderRadius:"20px"
-                }}
-              />
+
+
+return(
+
+<div style={page}>
+
+
+<h1 style={{color:"white"}}>
+🔐 Admin Panel
+</h1>
 
 
 
-              <div
-                style={{
-                  display:"flex",
-                  gap:"10px",
-                  marginTop:"20px"
-                }}
-              >
-
-
-                <button
-                  style={approveBtn}
-                  onClick={()=>approve(p.id)}
-                >
-                  ✅ Approve
-                </button>
+<h2 style={{color:"white"}}>
+📸 Task Proof Requests
+</h2>
 
 
 
-                <button
-                  style={rejectBtn}
-                  onClick={()=>reject(p.id)}
-                >
-                  ❌ Reject
-                </button>
+{
+proofs.map(p=>(
+
+<div style={card} key={p.id}>
+
+<h3>
+👤 {p.username}
+</h3>
+
+<p>
+Campaign ID : {p.campaignId}
+</p>
+
+<img
+src={`${API}/uploads/${p.screenshot}`}
+style={img}
+/>
 
 
-              </div>
+<div style={row}>
+
+<button
+style={green}
+onClick={()=>approve(p.id)}
+>
+✅ Approve
+</button>
 
 
-            </div>
+<button
+style={red}
+onClick={()=>reject(p.id)}
+>
+❌ Reject
+</button>
 
 
-          ))
+</div>
 
 
-        )
-      }
+</div>
+
+))
+}
 
 
 
-    </div>
 
-  );
+<h2 style={{color:"white"}}>
+💰 Coin Payment Requests
+</h2>
+
+
+
+
+{
+coinRequests.map(c=>(
+
+
+<div style={card} key={c.id}>
+
+
+<h3>
+👤 {c.username}
+</h3>
+
+
+<p>
+💎 {c.packageName}
+</p>
+
+
+<p>
+💵 ₹{c.amount}
+</p>
+
+
+
+<p>
+📸 Screenshot : {c.screenshot}
+</p>
+
+
+
+<div style={row}>
+
+
+<button
+style={green}
+onClick={()=>coinApprove(c.id)}
+>
+✅ Add Coins
+</button>
+
+
+
+<button
+style={red}
+onClick={()=>coinReject(c.id)}
+>
+❌ Reject
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+))
 
 }
 
 
 
+
+</div>
+
+
+);
+
+
+}
+
+
+
+
+
+const page={
+
+minHeight:"100vh",
+padding:"25px",
+background:"linear-gradient(135deg,#141e30,#243b55)",
+fontFamily:"Arial"
+
+};
+
+
+
 const card={
 
- background:"rgba(255,255,255,0.12)",
- backdropFilter:"blur(12px)",
- borderRadius:"25px",
- padding:"20px",
- marginBottom:"20px",
- color:"white"
+background:"rgba(255,255,255,0.12)",
+padding:"20px",
+borderRadius:"25px",
+marginBottom:"20px",
+color:"white"
 
 };
 
 
-const approveBtn={
 
- flex:1,
- padding:"14px",
- borderRadius:"20px",
- border:"none",
- background:"#00c853",
- color:"white",
- fontWeight:"bold"
+const img={
+
+width:"100%",
+borderRadius:"20px"
 
 };
 
 
-const rejectBtn={
 
- flex:1,
- padding:"14px",
- borderRadius:"20px",
- border:"none",
- background:"#d50000",
- color:"white",
- fontWeight:"bold"
+const row={
+
+display:"flex",
+gap:"10px",
+marginTop:"15px"
+
+};
+
+
+
+const green={
+
+flex:1,
+padding:"14px",
+borderRadius:"20px",
+border:"none",
+background:"#00c853",
+color:"white",
+fontWeight:"bold"
+
+};
+
+
+
+const red={
+
+flex:1,
+padding:"14px",
+borderRadius:"20px",
+border:"none",
+background:"#d50000",
+color:"white",
+fontWeight:"bold"
 
 };

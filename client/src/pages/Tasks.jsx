@@ -1,38 +1,52 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const API = "https://venom-server-5dey.onrender.com";
 
+
 export default function Tasks() {
 
-  const loginUser = JSON.parse(localStorage.getItem("venomUser"));
+  const loginUser = JSON.parse(
+    localStorage.getItem("venomUser")
+  );
 
-  const [campaigns, setCampaigns] = useState([]);
-  const [selectedFiles, setSelectedFiles] = useState({});
 
-  useEffect(() => {
+  const [campaigns,setCampaigns]=useState([]);
+  const [selectedFiles,setSelectedFiles]=useState({});
+
+
+
+  useEffect(()=>{
+
     loadCampaigns();
-  }, []);
+
+  },[]);
 
 
-  async function loadCampaigns() {
 
-    try {
+  async function loadCampaigns(){
+
+    try{
 
       const res = await axios.get(
         `${API}/tasks`,
         {
           params:{
-            username: loginUser.username
+            username:loginUser.username
           }
         }
       );
 
+
       if(res.data.success){
+
         setCampaigns(res.data.tasks);
+
       }
 
-    } catch(err){
+
+    }catch(err){
 
       console.log(err);
       alert("Server Error");
@@ -42,39 +56,62 @@ export default function Tasks() {
   }
 
 
+
   async function uploadProof(campaignId){
 
     const file = selectedFiles[campaignId];
 
+
     if(!file){
+
       alert("Please Select Screenshot");
       return;
+
     }
+
 
 
     const formData = new FormData();
 
-    formData.append("username", loginUser.username);
-    formData.append("campaignId", campaignId);
-    formData.append("screenshot", file);
+    formData.append(
+      "username",
+      loginUser.username
+    );
+
+    formData.append(
+      "campaignId",
+      campaignId
+    );
+
+    formData.append(
+      "screenshot",
+      file
+    );
+
 
 
     try{
 
+
       const res = await axios.post(
+
         `${API}/proof/upload`,
+
         formData,
+
         {
           headers:{
             "Content-Type":"multipart/form-data"
           }
         }
+
       );
 
 
       alert(res.data.message);
 
       loadCampaigns();
+
 
 
     }catch(err){
@@ -87,24 +124,39 @@ export default function Tasks() {
   }
 
 
-  return (
+
+  return(
 
     <div
-      style={{
-        minHeight:"100vh",
-        padding:"20px",
-        background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
-        fontFamily:"Arial"
-      }}
+    style={{
+      minHeight:"100vh",
+      padding:"20px",
+      background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+      fontFamily:"Arial"
+    }}
     >
 
+
+
+      <Link to="/home">
+
+        <button style={backBtn}>
+          ⬅️ Back Home
+        </button>
+
+      </Link>
+
+
+
       <h1
-        style={{
-          color:"white",
-          textAlign:"center"
-        }}
+      style={{
+        color:"white",
+        textAlign:"center"
+      }}
       >
+
         🚀 Available Tasks
+
       </h1>
 
 
@@ -112,19 +164,25 @@ export default function Tasks() {
       {
         campaigns.length===0 ? (
 
-          <h3 style={{color:"white",textAlign:"center"}}>
+          <h3
+          style={{
+            color:"white",
+            textAlign:"center"
+          }}
+          >
             No Task Available
           </h3>
 
-        ) : (
+
+        ):(
 
 
           campaigns.map((c)=>(
 
 
             <div
-              key={c.id}
-              style={card}
+            key={c.id}
+            style={card}
             >
 
 
@@ -148,6 +206,7 @@ export default function Tasks() {
               </p>
 
 
+
               {
                 c.type==="Comment" &&
                 <p>
@@ -158,9 +217,9 @@ export default function Tasks() {
 
 
               <a
-                href={c.link}
-                target="_blank"
-                rel="noreferrer"
+              href={c.link}
+              target="_blank"
+              rel="noreferrer"
               >
 
                 <button style={btn}>
@@ -172,24 +231,28 @@ export default function Tasks() {
 
 
               <input
-                style={{marginTop:"20px"}}
-                type="file"
-                accept="image/*"
-                onChange={(e)=>
-                  setSelectedFiles({
-                    ...selectedFiles,
-                    [c.id]:e.target.files[0]
-                  })
-                }
+              style={{marginTop:"20px"}}
+              type="file"
+              accept="image/*"
+              onChange={(e)=>
+                setSelectedFiles({
+                  ...selectedFiles,
+                  [c.id]:e.target.files[0]
+                })
+              }
               />
 
 
+
               <button
-                style={uploadBtn}
-                onClick={()=>uploadProof(c.id)}
+              style={uploadBtn}
+              onClick={()=>uploadProof(c.id)}
               >
+
                 📸 Upload Proof
+
               </button>
+
 
 
             </div>
@@ -198,7 +261,9 @@ export default function Tasks() {
           ))
 
         )
+
       }
+
 
 
     </div>
@@ -206,6 +271,7 @@ export default function Tasks() {
   );
 
 }
+
 
 
 
@@ -221,6 +287,7 @@ const card={
 };
 
 
+
 const badge={
 
  display:"inline-block",
@@ -231,6 +298,7 @@ const badge={
  fontWeight:"bold"
 
 };
+
 
 
 const btn={
@@ -247,6 +315,7 @@ const btn={
 };
 
 
+
 const uploadBtn={
 
  width:"100%",
@@ -258,5 +327,20 @@ const uploadBtn={
  color:"white",
  fontWeight:"bold",
  fontSize:"16px"
+
+};
+
+
+
+const backBtn={
+
+ width:"100%",
+ padding:"14px",
+ borderRadius:"20px",
+ border:"none",
+ background:"white",
+ color:"#833ab4",
+ fontWeight:"bold",
+ fontSize:"17px"
 
 };

@@ -1,122 +1,217 @@
 import { Link } from "react-router-dom";
+import { Preferences } from "@capacitor/preferences";
 
-export default function Home() {
+
+export default function Home(){
 
   const user = JSON.parse(
     localStorage.getItem("venomUser")
   );
 
-  return (
-
-    <div
-      style={{
-        minHeight:"100vh",
-        padding:"25px",
-        textAlign:"center",
-        background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
-        color:"white",
-        fontFamily:"Arial"
-      }}
-    >
-
-      <h1 style={{
-        fontSize:"38px",
-        marginBottom:"10px"
-      }}>
-        Venom 🐍
-      </h1>
-
-      <div
-        style={{
-          background:"rgba(255,255,255,0.15)",
-          backdropFilter:"blur(10px)",
-          borderRadius:"25px",
-          padding:"25px",
-          marginBottom:"30px"
-        }}
-      >
-
-        <h2>
-          Welcome 👋
-        </h2>
-
-        <h2>
-          {user ? user.username : "Guest"}
-        </h2>
-
-        <h1>
-          🪙 {user ? user.coins : 0}
-        </h1>
-
-        <p>
-          Your Coins
-        </p>
-
-      </div>
 
 
-      <div style={{display:"grid",gap:"15px"}}>
+  async function logout(){
+
+    await Preferences.remove({
+      key:"venomUser"
+    });
 
 
-        <Link to="/tasks">
-          <button style={btn}>
-            🚀 Available Tasks
-          </button>
-        </Link>
+    localStorage.removeItem(
+      "venomUser"
+    );
 
 
-        <Link to="/wallet">
-          <button style={btn}>
-            🪙 Wallet
-          </button>
-        </Link>
+    window.location.href="/";
+
+  }
 
 
-        <Link to="/campaign">
-          <button style={btn}>
-            📢 Create Campaign
-          </button>
-        </Link>
+
+return(
+
+<div style={page}>
 
 
-        <Link to="/leaderboard">
-          <button style={btn}>
-            🏆 Leaderboard
-          </button>
-        </Link>
+<h1 style={title}>
+Venom 🐍
+</h1>
 
 
-        <button
-          style={btn}
-          onClick={()=>{
-            localStorage.removeItem("venomUser");
-            window.location.href="/";
-          }}
-        >
-          🚪 Logout
-        </button>
+
+<div style={profile}>
 
 
-      </div>
+<h2>
+Welcome 👋
+</h2>
 
 
-    </div>
+<h2>
+{user ? user.username : "Guest"}
+</h2>
 
-  );
+
+
+<h1>
+🪙 {user ? user.coins : 0}
+</h1>
+
+
+<p>
+Your Coins
+</p>
+
+
+
+</div>
+
+
+
+
+
+<div style={menu}>
+
+
+<Link to="/tasks">
+<button style={btn}>
+🚀 Available Tasks
+</button>
+</Link>
+
+
+
+<Link to="/wallet">
+<button style={btn}>
+🪙 Wallet
+</button>
+</Link>
+
+
+
+
+<Link to="/buycoins">
+<button style={btn}>
+💎 Buy Coins
+</button>
+</Link>
+
+
+
+
+<Link to="/campaign">
+<button style={btn}>
+📢 Create Campaign
+</button>
+</Link>
+
+
+
+
+<Link to="/leaderboard">
+<button style={btn}>
+🏆 Leaderboard
+</button>
+</Link>
+
+
+
+
+
+<button
+style={btn}
+onClick={logout}
+>
+🚪 Logout
+</button>
+
+
+
+
+</div>
+
+
+
+</div>
+
+);
+
 
 }
 
 
-const btn = {
 
-  width:"100%",
-  padding:"16px",
-  borderRadius:"20px",
-  border:"none",
-  fontSize:"18px",
-  fontWeight:"bold",
-  background:"white",
-  color:"#833ab4",
-  cursor:"pointer"
+
+const page={
+
+minHeight:"100vh",
+
+padding:"25px",
+
+textAlign:"center",
+
+background:
+"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+
+color:"white",
+
+fontFamily:"Arial"
+
+};
+
+
+
+const title={
+
+fontSize:"42px"
+
+};
+
+
+
+const profile={
+
+background:
+"rgba(255,255,255,0.15)",
+
+backdropFilter:"blur(12px)",
+
+borderRadius:"30px",
+
+padding:"30px",
+
+marginBottom:"30px"
+
+};
+
+
+
+const menu={
+
+display:"grid",
+
+gap:"15px"
+
+};
+
+
+
+const btn={
+
+width:"100%",
+
+padding:"16px",
+
+borderRadius:"20px",
+
+border:"none",
+
+background:"white",
+
+color:"#833ab4",
+
+fontSize:"18px",
+
+fontWeight:"bold"
 
 };

@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Preferences } from "@capacitor/preferences";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -8,26 +10,114 @@ import Campaign from "./pages/Campaign";
 import Leaderboard from "./pages/Leaderboard";
 import Tasks from "./pages/Tasks";
 import Admin from "./pages/Admin";
+import BuyCoins from "./pages/BuyCoins";
 
-export default function App() {
 
-  return (
+function Start(){
+
+  const [loading,setLoading]=useState(true);
+  const [user,setUser]=useState(null);
+
+
+  useEffect(()=>{
+
+    async function checkUser(){
+
+      const data = await Preferences.get({
+        key:"venomUser"
+      });
+
+
+      if(data.value){
+
+        setUser(JSON.parse(data.value));
+
+      }
+
+
+      setLoading(false);
+
+    }
+
+
+    checkUser();
+
+
+  },[]);
+
+
+
+  if(loading){
+
+    return(
+
+      <div
+      style={{
+        textAlign:"center",
+        marginTop:"100px",
+        fontSize:"25px"
+      }}
+      >
+
+      Loading Venom 🐍...
+
+      </div>
+
+    );
+
+  }
+
+
+
+  return(
+
+    <Routes>
+
+
+      <Route
+      path="/"
+      element={
+        user
+        ? <Navigate to="/home"/>
+        : <Login/>
+      }
+      />
+
+
+      <Route path="/login" element={<Login/>}/>
+
+      <Route path="/register" element={<Register/>}/>
+
+      <Route path="/home" element={<Home/>}/>
+
+      <Route path="/wallet" element={<Wallet/>}/>
+
+      <Route path="/tasks" element={<Tasks/>}/>
+
+      <Route path="/campaign" element={<Campaign/>}/>
+
+      <Route path="/leaderboard" element={<Leaderboard/>}/>
+
+      <Route path="/buycoins" element={<BuyCoins/>}/>
+
+      <Route path="/admin" element={<Admin/>}/>
+
+
+    </Routes>
+
+  );
+
+}
+
+
+
+export default function App(){
+
+  return(
 
     <BrowserRouter>
 
-      <Routes>
-
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/wallet" element={<Wallet />} />
-        <Route path="/tasks" element={<Tasks />} />
-        <Route path="/campaign" element={<Campaign />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
-        <Route path="/admin" element={<Admin />} />
-
-      </Routes>
+      <Start/>
 
     </BrowserRouter>
 

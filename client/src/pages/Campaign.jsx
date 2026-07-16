@@ -1,26 +1,32 @@
 import { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const API = "https://venom-server-5dey.onrender.com";
 
 export default function Campaign() {
 
-  const loginUser = JSON.parse(localStorage.getItem("venomUser"));
-
-  const [type, setType] = useState("Follow");
-  const [link, setLink] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [commentText, setCommentText] = useState("");
+  const loginUser = JSON.parse(
+    localStorage.getItem("venomUser")
+  );
 
 
-  async function createCampaign() {
+  const [type,setType]=useState("Follow");
+  const [link,setLink]=useState("");
+  const [quantity,setQuantity]=useState("");
+  const [commentText,setCommentText]=useState("");
 
-    try {
+
+
+  async function createCampaign(){
+
+    try{
+
 
       const res = await axios.post(
         `${API}/campaign/create`,
         {
-          username: loginUser.username,
+          username:loginUser.username,
           type,
           link,
           quantity,
@@ -38,14 +44,16 @@ export default function Campaign() {
         setQuantity("");
         setCommentText("");
 
-      }else{
+      }
+      else{
 
         alert(res.data.message);
 
       }
 
 
-    }catch(err){
+    }
+    catch(err){
 
       console.log(err);
       alert("Server Error");
@@ -55,16 +63,27 @@ export default function Campaign() {
   }
 
 
-  return (
+
+  return(
 
     <div
-      style={{
-        minHeight:"100vh",
-        padding:"25px",
-        background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
-        fontFamily:"Arial"
-      }}
+    style={{
+      minHeight:"100vh",
+      padding:"25px",
+      background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+      fontFamily:"Arial"
+    }}
     >
+
+
+      <Link to="/home">
+
+        <button style={backBtn}>
+          ⬅️ Back Home
+        </button>
+
+      </Link>
+
 
 
       <div style={box}>
@@ -82,9 +101,9 @@ export default function Campaign() {
 
 
         <select
-          value={type}
-          onChange={(e)=>setType(e.target.value)}
-          style={input}
+        value={type}
+        onChange={(e)=>setType(e.target.value)}
+        style={input}
         >
 
           <option>Follow</option>
@@ -96,20 +115,20 @@ export default function Campaign() {
 
 
         <input
-          placeholder="Instagram Link"
-          value={link}
-          onChange={(e)=>setLink(e.target.value)}
-          style={input}
+        placeholder="Instagram Link"
+        value={link}
+        onChange={(e)=>setLink(e.target.value)}
+        style={input}
         />
 
 
 
         <input
-          type="number"
-          placeholder="Quantity"
-          value={quantity}
-          onChange={(e)=>setQuantity(e.target.value)}
-          style={input}
+        type="number"
+        placeholder="Quantity"
+        value={quantity}
+        onChange={(e)=>setQuantity(e.target.value)}
+        style={input}
         />
 
 
@@ -118,10 +137,10 @@ export default function Campaign() {
           type==="Comment" && (
 
             <textarea
-              placeholder="Comment Text"
-              value={commentText}
-              onChange={(e)=>setCommentText(e.target.value)}
-              style={input}
+            placeholder="Comment Text"
+            value={commentText}
+            onChange={(e)=>setCommentText(e.target.value)}
+            style={input}
             />
 
           )
@@ -130,11 +149,14 @@ export default function Campaign() {
 
 
         <button
-          onClick={createCampaign}
-          style={button}
+        onClick={createCampaign}
+        style={button}
         >
+
           🚀 Create Order
+
         </button>
+
 
 
       </div>
@@ -145,6 +167,7 @@ export default function Campaign() {
   );
 
 }
+
 
 
 
@@ -161,6 +184,7 @@ const box={
 };
 
 
+
 const input={
 
  width:"90%",
@@ -174,6 +198,7 @@ const input={
 };
 
 
+
 const button={
 
  width:"100%",
@@ -185,5 +210,21 @@ const button={
  color:"#833ab4",
  fontSize:"18px",
  fontWeight:"bold"
+
+};
+
+
+
+const backBtn={
+
+ width:"100%",
+ padding:"14px",
+ borderRadius:"20px",
+ border:"none",
+ background:"white",
+ color:"#833ab4",
+ fontWeight:"bold",
+ fontSize:"17px",
+ marginBottom:"20px"
 
 };
