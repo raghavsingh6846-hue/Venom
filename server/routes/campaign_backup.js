@@ -15,7 +15,6 @@ fs.readFileSync(DB,"utf8")
 }
 
 
-
 function saveDB(data){
 
 fs.writeFileSync(
@@ -29,12 +28,9 @@ JSON.stringify(data,null,2)
 
 
 
+// USER ACTIVE CAMPAIGNS
 
-// USER VIEW ACTIVE CAMPAIGNS
-
-router.get(
-"/",
-(req,res)=>{
+router.get("/",(req,res)=>{
 
 
 const db=loadDB();
@@ -44,7 +40,8 @@ res.json({
 
 success:true,
 
-campaigns:(db.campaigns || []).filter(
+campaigns:
+db.campaigns.filter(
 c=>c.status==="Active"
 )
 
@@ -59,14 +56,10 @@ c=>c.status==="Active"
 
 
 
+// CREATE CAMPAIGN
 
 
-
-// CREATE CAMPAIGN / ORDER
-
-router.post(
-"/create",
-(req,res)=>{
+router.post("/create",(req,res)=>{
 
 
 const {
@@ -128,6 +121,7 @@ reward * Number(quantity);
 
 
 
+
 if(user.coins < totalCoins){
 
 return res.json({
@@ -142,11 +136,7 @@ message:"Insufficient Coins"
 
 
 
-
 user.coins -= totalCoins;
-
-
-
 
 
 
@@ -183,19 +173,9 @@ completed:[],
 status:"Active",
 
 
-createdAt:new Date().toISOString()
-
+createdAt:new Date()
 
 };
-
-
-
-
-if(!db.campaigns){
-
-db.campaigns=[];
-
-}
 
 
 
@@ -211,8 +191,6 @@ res.json({
 
 success:true,
 
-message:"Campaign Created",
-
 campaign,
 
 coins:user.coins
@@ -220,11 +198,8 @@ coins:user.coins
 });
 
 
+
 });
-
-
-
-
 
 
 
@@ -235,6 +210,7 @@ coins:user.coins
 
 // ADMIN ALL CAMPAIGNS
 
+
 router.get(
 "/admin/all",
 (req,res)=>{
@@ -243,19 +219,17 @@ router.get(
 const db=loadDB();
 
 
+
 res.json({
 
 success:true,
 
-campaigns:db.campaigns || []
+campaigns:db.campaigns
 
 });
 
 
 });
-
-
-
 
 
 
@@ -267,6 +241,7 @@ campaigns:db.campaigns || []
 
 // ADMIN DELETE CAMPAIGN
 
+
 router.post(
 "/admin/delete",
 (req,res)=>{
@@ -275,32 +250,27 @@ router.post(
 const {id}=req.body;
 
 
+
 const db=loadDB();
 
 
 
-const index=db.campaigns.findIndex(
-c=>c.id==id
+db.campaigns =
+db.campaigns.filter(
+c=>c.id!=id
 );
 
 
 
-if(index===-1){
 
-return res.json({
+if(db.proofs){
 
-success:false,
-
-message:"Campaign Not Found"
-
-});
+db.proofs =
+db.proofs.filter(
+p=>p.campaignId!=id
+);
 
 }
-
-
-
-
-db.campaigns.splice(index,1);
 
 
 
@@ -318,8 +288,6 @@ message:"Campaign Deleted"
 
 
 });
-
-
 
 
 

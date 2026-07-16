@@ -4,9 +4,8 @@ const multer = require("multer");
 
 const router = express.Router();
 
-const DB="./db.json";
-
-const REQUEST_DB="./coin_requests.json";
+const DB="./coin_requests.json";
+const USER_DB="./db.json";
 
 
 
@@ -14,31 +13,28 @@ const storage = multer.diskStorage({
 
 destination:(req,file,cb)=>{
 
-cb(null,"uploads/");
+cb(null,"uploads");
 
 },
 
 
 filename:(req,file,cb)=>{
 
-cb(
-null,
-Date.now()+"-"+file.originalname
-);
+cb(null,Date.now()+"-"+file.originalname);
 
 }
+
 
 });
 
 
-const upload = multer({
+const upload=multer({
 storage
 });
 
 
 
-
-function loadDB(){
+function loadRequests(){
 
 return JSON.parse(
 fs.readFileSync(DB,"utf8")
@@ -48,7 +44,7 @@ fs.readFileSync(DB,"utf8")
 
 
 
-function saveDB(data){
+function saveRequests(data){
 
 fs.writeFileSync(
 DB,
@@ -59,27 +55,20 @@ JSON.stringify(data,null,2)
 
 
 
-function loadRequests(){
-
-if(!fs.existsSync(REQUEST_DB)){
-
-return [];
-
-}
-
+function loadUsers(){
 
 return JSON.parse(
-fs.readFileSync(REQUEST_DB,"utf8")
+fs.readFileSync(USER_DB,"utf8")
 );
 
 }
 
 
 
-function saveRequests(data){
+function saveUsers(data){
 
 fs.writeFileSync(
-REQUEST_DB,
+USER_DB,
 JSON.stringify(data,null,2)
 );
 
@@ -89,9 +78,7 @@ JSON.stringify(data,null,2)
 
 
 
-
-
-// USER SEND PAYMENT SCREENSHOT
+// USER SEND PAYMENT
 
 router.post(
 "/request",
@@ -111,36 +98,31 @@ const requests=loadRequests();
 
 
 
-const request={
-
+const data={
 
 id:Date.now(),
 
-
 username,
-
 
 packageName,
 
-
-amount:Number(amount),
-
+amount,
 
 screenshot:req.file
 ? req.file.filename
 :"",
 
 
-status:"Pending",
+status:"pending",
 
 
-createdAt:new Date().toISOString()
+createdAt:new Date()
 
 };
 
 
 
-requests.push(request);
+requests.push(data);
 
 
 saveRequests(requests);
@@ -151,7 +133,7 @@ res.json({
 
 success:true,
 
-message:"Payment Submitted"
+message:"Payment Request Submitted"
 
 });
 
@@ -164,8 +146,7 @@ message:"Payment Submitted"
 
 
 
-
-// ADMIN GET PAYMENT REQUESTS
+// ADMIN ONLY PENDING REQUESTS
 
 router.get(
 "/requests",
@@ -180,16 +161,15 @@ res.json({
 
 success:true,
 
-requests:requests.filter(
-r=>r.status==="Pending"
+requests:
+requests.filter(
+r=>r.status==="pending"
 )
 
 });
 
 
 });
-
-
 
 
 
@@ -206,7 +186,6 @@ router.post(
 
 
 const {id}=req.body;
-
 
 
 const requests=loadRequests();
@@ -232,69 +211,54 @@ message:"Request Not Found"
 
 
 
-
-const db=loadDB();
-
+const users=loadUsers();
 
 
-const user=db.users.find(
+
+const user=users.users.find(
 u=>u.username===request.username
 );
 
 
 
-if(!user){
-
-return res.json({
-
-success:false,
-
-message:"User Not Found"
-
-});
-
-}
-
-
+if(user){
 
 
 let coins=0;
 
 
 
-if(request.packageName==="50 Coins"){
-
+if(request.packageName==="50 Coins")
 coins=50;
 
-}
 
-
-if(request.packageName==="100 Coins"){
-
+if(request.packageName==="100 Coins")
 coins=100;
 
-}
 
-
-if(request.packageName==="320 Coins"){
-
+if(request.packageName==="320 Coins")
 coins=320;
 
+
+
+user.coins+=coins;
+
+
+user.payments =
+(user.payments || 0)+1;
+
+
+
 }
 
 
 
-
-user.coins =
-(user.coins || 0)+coins;
+saveUsers(users);
 
 
 
-request.status="Approved";
+request.status="approved";
 
-
-
-saveDB(db);
 
 saveRequests(requests);
 
@@ -304,15 +268,12 @@ res.json({
 
 success:true,
 
-message:"Coins Added"
+message:"Payment Approved"
 
 });
 
 
 });
-
-
-
 
 
 
@@ -321,6 +282,7 @@ message:"Coins Added"
 
 
 // REJECT PAYMENT
+
 
 router.post(
 "/reject",
@@ -342,7 +304,7 @@ r=>r.id==id
 
 if(request){
 
-request.status="Rejected";
+request.status="rejected";
 
 }
 
@@ -362,7 +324,6 @@ message:"Payment Rejected"
 
 
 });
-
 
 
 

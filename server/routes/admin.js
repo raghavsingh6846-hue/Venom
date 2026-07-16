@@ -3,81 +3,61 @@ const fs = require("fs");
 
 const router = express.Router();
 
-const DB = "./db.json";
-const COIN_DB = "./coin_requests.json";
+const DB="./db.json";
 
 
 function loadDB(){
 
-  return JSON.parse(
-    fs.readFileSync(DB,"utf8")
-  );
+return JSON.parse(
+fs.readFileSync(DB,"utf8")
+);
 
 }
+
 
 
 function saveDB(data){
 
-  fs.writeFileSync(
-    DB,
-    JSON.stringify(data,null,2)
-  );
-
-}
-
-
-function loadCoins(){
-
-  return JSON.parse(
-    fs.readFileSync(COIN_DB,"utf8")
-  );
-
-}
-
-
-function saveCoins(data){
-
-  fs.writeFileSync(
-    COIN_DB,
-    JSON.stringify(data,null,2)
-  );
+fs.writeFileSync(
+DB,
+JSON.stringify(data,null,2)
+);
 
 }
 
 
 
-/* ADMIN LOGIN */
+/* GET ALL USERS */
 
-router.post("/login",(req,res)=>{
-
- const {username,password}=req.body;
-
- const db=loadDB();
+router.get("/users",(req,res)=>{
 
 
- if(
-  !db.admin ||
-  db.admin.username!==username ||
-  db.admin.password!==password
- ){
-
-  return res.json({
-   success:false,
-   message:"Invalid Admin Login"
-  });
-
- }
+const db=loadDB();
 
 
- res.json({
+res.json({
 
-  success:true,
+success:true,
 
-  admin:{
-   username:db.admin.username
-  }
+users:db.users.map(u=>({
 
- });
+id:u.id,
+
+username:u.username,
+
+coins:u.coins,
+
+trustScore:u.trustScore || 100,
+
+tasksCompleted:u.tasksCompleted || 0,
+
+status:u.status || "active",
+
+createdAt:u.createdAt
+
+}))
+
+});
 
 
 });
@@ -86,161 +66,51 @@ router.post("/login",(req,res)=>{
 
 
 
-/* TASK PROOFS */
+/* BLOCK USER */
 
 
-router.get("/proofs",(req,res)=>{
-
- const db=loadDB();
+router.post("/block",(req,res)=>{
 
 
- res.json({
-
-  success:true,
-
-  proofs:(db.proofs||[]).filter(
-   p=>p.status==="Pending"
-  )
-
- });
+const {id}=req.body;
 
 
-});
+const db=loadDB();
 
 
 
-
-
-router.post("/approve",(req,res)=>{
-
-
- const {proofId}=req.body;
-
- const db=loadDB();
-
-
- const proof=(db.proofs||[]).find(
-  p=>p.id==proofId
- );
-
-
- if(!proof){
-
-  return res.json({
-   success:false,
-   message:"Proof Not Found"
-  });
-
- }
+const user=db.users.find(
+u=>u.id==id
+);
 
 
 
- const campaign=db.campaigns.find(
-  c=>c.id==proof.campaignId
- );
+if(user){
+
+user.status="blocked";
+
+saveDB(db);
 
 
- const user=db.users.find(
-  u=>u.username==proof.username
- );
+return res.json({
 
+success:true,
 
- if(!campaign || !user){
-
-  return res.json({
-   success:false,
-   message:"Invalid Data"
-  });
-
- }
-
-
- proof.status="Approved";
-
-
- user.trustScore=(user.trustScore||100)+2;
-
- user.coins+=campaign.reward;
-
-
- saveDB(db);
-
-
- res.json({
-
-  success:true,
-  message:"Proof Approved"
-
- });
-
+message:"User Blocked"
 
 });
 
+}
 
 
 
+res.json({
 
-router.post("/reject",(req,res)=>{
+success:false,
 
+message:"User not found"
 
- const {proofId}=req.body;
-
-
- const db=loadDB();
-
-
- const proof=(db.proofs||[]).find(
-  p=>p.id==proofId
- );
-
-
- if(!proof){
-
-  return res.json({
-   success:false,
-   message:"Proof Not Found"
-  });
-
- }
-
-
- const user=db.users.find(
-  u=>u.username==proof.username
- );
-
-
- proof.status="Rejected";
-
-
- if(user){
-
-  user.trustScore=user.trustScore||100;
-
-  user.rejectCount=user.rejectCount||0;
-
-  user.rejectCount++;
-
-  user.trustScore-=5;
-
-  const penalty=user.rejectCount*5;
-
-  user.coins=Math.max(
-   0,
-   user.coins-penalty
-  );
-
- }
-
-
- saveDB(db);
-
-
- res.json({
-
-  success:true,
-  message:"Proof Rejected"
-
- });
+});
 
 
 });
@@ -250,157 +120,57 @@ router.post("/reject",(req,res)=>{
 
 
 
-/* =========================
-   COIN PAYMENT REQUESTS
-========================= */
+/* UNBLOCK USER */
+
+
+router.post("/unblock",(req,res)=>{
+
+
+const {id}=req.body;
+
+
+const db=loadDB();
 
 
 
-router.get("/coin-requests",(req,res)=>{
-
-
- const requests=loadCoins();
-
-
- res.json({
-
-  success:true,
-
-  requests:requests.filter(
-   r=>r.status==="pending"
-  )
-
- });
-
-
-});
+const user=db.users.find(
+u=>u.id==id
+);
 
 
 
+if(user){
+
+user.status="active";
 
 
-router.post("/coin-approve",(req,res)=>{
-
-
- const {id}=req.body;
-
-
- const requests=loadCoins();
-
-
- const request=requests.find(
-  r=>r.id==id
- );
-
-
- if(!request){
-
-  return res.json({
-
-   success:false,
-
-   message:"Request Not Found"
-
-  });
-
- }
+saveDB(db);
 
 
 
- const db=loadDB();
+return res.json({
 
+success:true,
 
-
- const user=db.users.find(
-  u=>u.username===request.username
- );
-
-
- if(user){
-
-
-  let coins=0;
-
-
-  if(request.packageName==="50 Coins")
-   coins=50;
-
-
-  if(request.packageName==="100 Coins")
-   coins=100;
-
-
-  if(request.packageName==="320 Coins")
-   coins=320;
-
-
-  user.coins+=coins;
-
-
- }
-
-
-
- request.status="approved";
-
-
- saveDB(db);
-
- saveCoins(requests);
-
-
-
- res.json({
-
-  success:true,
-
-  message:"Coins Added"
-
- });
-
+message:"User Unblocked"
 
 });
 
 
+}
 
 
 
-router.post("/coin-reject",(req,res)=>{
+res.json({
 
+success:false,
 
- const {id}=req.body;
-
-
- const requests=loadCoins();
-
-
- const request=requests.find(
-  r=>r.id==id
- );
-
-
- if(request){
-
-  request.status="rejected";
-
- }
-
-
- saveCoins(requests);
-
-
-
- res.json({
-
-  success:true,
-
-  message:"Payment Rejected"
-
- });
-
+message:"User not found"
 
 });
 
+
+});
 
 
 

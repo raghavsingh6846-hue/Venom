@@ -7,20 +7,26 @@ const router = express.Router();
 const DB="./db.json";
 
 
+
 const storage = multer.diskStorage({
 
 destination:(req,file,cb)=>{
+
 cb(null,"uploads/");
+
 },
 
+
 filename:(req,file,cb)=>{
+
 cb(null,Date.now()+"-"+file.originalname);
+
 }
 
 });
 
 
-const upload = multer({
+const upload=multer({
 storage
 });
 
@@ -48,8 +54,8 @@ JSON.stringify(data,null,2)
 
 
 
+// USER UPLOAD PROOF
 
-// USER UPLOAD TASK SCREENSHOT
 
 router.post(
 "/upload",
@@ -64,11 +70,15 @@ type
 }=req.body;
 
 
+
 const db=loadDB();
 
 
+
 if(!db.proofs){
+
 db.proofs=[];
+
 }
 
 
@@ -76,42 +86,56 @@ db.proofs=[];
 let reward=0;
 
 
+
 if(type==="Like")
 reward=1;
 
+
 if(type==="Follow")
 reward=2;
+
 
 if(type==="Comment")
 reward=3;
 
 
 
+
+
 const proof={
+
 
 id:Date.now(),
 
+
 username,
+
 
 campaignId:Number(campaignId),
 
+
 type,
 
+
 reward,
+
 
 screenshot:req.file
 ? req.file.filename
 :"",
 
+
 status:"Pending",
 
-createdAt:new Date().toISOString()
+
+createdAt:new Date()
 
 };
 
 
 
 db.proofs.push(proof);
+
 
 
 saveDB(db);
@@ -122,11 +146,12 @@ res.json({
 
 success:true,
 
-message:"Screenshot Submitted"
+message:"Proof Uploaded"
 
 });
 
 
+
 });
 
 
@@ -135,7 +160,8 @@ message:"Screenshot Submitted"
 
 
 
-// ADMIN PENDING PROOFS
+// ADMIN VIEW PENDING PROOFS
+
 
 router.get(
 "/pending",
@@ -145,11 +171,13 @@ router.get(
 const db=loadDB();
 
 
+
 res.json({
 
 success:true,
 
-proofs:(db.proofs || []).filter(
+proofs:
+(db.proofs || []).filter(
 p=>p.status==="Pending"
 )
 
@@ -166,12 +194,14 @@ p=>p.status==="Pending"
 
 // ADMIN APPROVE
 
+
 router.post(
 "/approve",
 (req,res)=>{
 
 
 const {id}=req.body;
+
 
 
 const db=loadDB();
@@ -190,11 +220,13 @@ return res.json({
 
 success:false,
 
-message:"Proof Not Found"
+message:"Not Found"
 
 });
 
 }
+
+
 
 
 
@@ -207,12 +239,12 @@ u=>u.username===proof.username
 if(user){
 
 
-user.coins =
-(user.coins || 0)+proof.reward;
+user.coins += proof.reward;
 
 
 user.tasksCompleted =
 (user.tasksCompleted || 0)+1;
+
 
 
 user.trustScore =
@@ -224,61 +256,8 @@ user.trustScore =
 
 
 
-
-
-const campaign=db.campaigns.find(
-c=>c.id==proof.campaignId
-);
-
-
-
-if(campaign){
-
-
-campaign.quantity =
-Math.max(
-0,
-campaign.quantity-1
-);
-
-
-
-if(!campaign.completed){
-
-campaign.completed=[];
-
-}
-
-
-
-if(
-!campaign.completed.includes(
-proof.username
-)
-){
-
-campaign.completed.push(
-proof.username
-);
-
-}
-
-
-if(campaign.quantity===0){
-
-campaign.status="Completed";
-
-}
-
-
-}
-
-
-
-
-
-
 proof.status="Approved";
+
 
 
 saveDB(db);
@@ -289,13 +268,12 @@ res.json({
 
 success:true,
 
-message:"Task Approved"
+message:"Approved"
 
 });
 
 
 });
-
 
 
 
@@ -306,12 +284,14 @@ message:"Task Approved"
 
 // ADMIN REJECT
 
+
 router.post(
 "/reject",
 (req,res)=>{
 
 
 const {id}=req.body;
+
 
 
 const db=loadDB();
@@ -324,18 +304,10 @@ p=>p.id==id
 
 
 
-if(!proof){
+if(proof){
 
-return res.json({
 
-success:false,
-
-message:"Proof Not Found"
-
-});
-
-}
-
+proof.status="Rejected";
 
 
 
@@ -353,8 +325,8 @@ user.trustScore =
 }
 
 
+}
 
-proof.status="Rejected";
 
 
 saveDB(db);
@@ -365,13 +337,13 @@ res.json({
 
 success:true,
 
-message:"Task Rejected"
+message:"Rejected"
 
 });
 
 
-});
 
+});
 
 
 

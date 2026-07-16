@@ -1,0 +1,155 @@
+{
+  "users": [
+    {
+      "id": 1784090725830,
+      "username": "Raj123",
+      "coins": 42,
+      "followers": 0,
+      "likes": 0
+    },
+    {
+      "id": 1784110352173,
+      "username": "Rohan77",
+      "coins": 16,
+      "followers": 0,
+      "likes": 0,
+      "trustScore": 108
+    }
+  ],
+  "campaigns": [
+    {
+      "id": 1,
+      "type": "Follow",
+      "username": "Raj123",
+      "title": "Follow Raj123",
+      "link": "https://instagram.com/raj123",
+      "reward": 2,
+      "quantity": 99,
+      "completed": [
+        "Raj123",
+        "Rohan77"
+      ],
+      "status": "Active"
+    },
+    {
+      "id": 1784133857843,
+      "username": "Raj123",
+      "type": "Follow",
+      "title": "Follow Task",
+      "link": "",
+      "reward": 2,
+      "quantity": 9,
+      "commentText": "",
+      "completed": [
+        "Raj123",
+        "Rohan77"
+      ],
+      "status": "Active"
+    },
+    {
+      "id": 1784134232747,
+      "username": "Raj123",
+      "type": "Follow",
+      "title": "Follow Task",
+      "link": "",
+      "reward": 2,
+      "quantity": 9,
+      "commentText": "",
+      "completed": [
+        "Rohan77"
+      ],
+      "status": "Active"
+    },
+    {
+      "id": 1784134352786,
+      "username": "Raj123",
+      "type": "Follow",
+      "title": "Follow Task",
+      "link": "https://www.instagram.com/shivansh_6835?igsh=YnhlZnQzam4wYTY3",
+      "reward": 2,
+      "quantity": 0,
+      "commentText": "",
+      "completed": [
+        "Raj123"
+      ],
+      "status": "Completed"
+    },
+    {
+      "id": 1784134471443,
+      "username": "Raj123",
+      "type": "Follow",
+      "title": "Follow Task",
+      "link": "https://www.instagram.com/shivansh_6835?igsh=YnhlZnQzam4wYTY3",
+      "reward": 2,
+      "quantity": 0,
+      "commentText": "",
+      "completed": [
+        "Rohan77"
+      ],
+      "status": "Completed"
+    },
+    {
+      "id": 1784172686574,
+      "username": "Raj123",
+      "type": "Follow",
+      "title": "Follow Task",
+      "link": "",
+      "reward": 2,
+      "quantity": 1,
+      "commentText": "",
+      "completed": [],
+      "status": "Active"
+    },
+    {
+      "id": 1784173931127,
+      "username": "Raj123",
+      "type": "Follow",
+      "title": "Follow Task",
+      "link": "",
+      "reward": 2,
+      "quantity": 1,
+      "commentText": "",
+      "completed": [],
+      "status": "Active"
+    }
+  ],
+  "tasks": [],
+  "proofs": [
+    {
+      "id": 1784171818083,
+      "username": "Rohan77",
+      "campaignId": 1,
+      "screenshot": "1784171818004-1000129078.png",
+      "status": "Approved",
+      "trustScore": 100,
+      "createdAt": "2026-07-16T03:16:58.083Z"
+    },
+    {
+      "id": 1784172629799,
+      "username": "Rohan77",
+      "campaignId": 1784133857843,
+      "screenshot": "1784172629771-1000129078.png",
+      "status": "Approved",
+      "trustScore": 100,
+      "createdAt": "2026-07-16T03:30:29.800Z"
+    },
+    {
+      "id": 1784172747685,
+      "username": "Rohan77",
+      "campaignId": 1784172686574,
+      "screenshot": "1784172747658-1000129077.png",
+      "status": "Approved",
+      "trustScore": 100,
+      "createdAt": "2026-07-16T03:32:27.685Z"
+    },
+    {
+      "id": 1784173972549,
+      "username": "Rohan77",
+      "campaignId": 1784173931127,
+      "screenshot": "1784173972521-1000129077.png",
+      "status": "Approved",
+      "trustScore": 100,
+      "createdAt": "2026-07-16T03:52:52.549Z"
+    }
+  ]
+}

@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const router = express.Router();
 
-const DB="./db.json";
+const DB = "./db.json";
 
 
 function loadDB(){
@@ -13,7 +13,6 @@ fs.readFileSync(DB,"utf8")
 );
 
 }
-
 
 
 function saveDB(data){
@@ -27,15 +26,10 @@ JSON.stringify(data,null,2)
 
 
 
+/* REGISTER */
 
 
-
-
-// REGISTER
-
-router.post(
-"/register",
-(req,res)=>{
+router.post("/register",(req,res)=>{
 
 
 const {
@@ -50,13 +44,11 @@ if(!username || !password){
 return res.json({
 
 success:false,
-
 message:"Username and Password Required"
 
 });
 
 }
-
 
 
 
@@ -75,13 +67,11 @@ if(exists){
 return res.json({
 
 success:false,
-
-message:"Username Already Exists"
+message:"Username already exists"
 
 });
 
 }
-
 
 
 
@@ -90,40 +80,39 @@ const user={
 
 id:Date.now(),
 
-
 username,
-
 
 password,
 
 
 coins:0,
 
-
 followers:0,
-
 
 likes:0,
 
 
 trustScore:100,
 
+rejectCount:0,
+
 
 tasksCompleted:0,
+
+payments:0,
 
 
 status:"active",
 
 
-createdAt:new Date().toISOString()
-
+createdAt:new Date()
 
 };
 
 
 
-
 db.users.push(user);
+
 
 
 saveDB(db);
@@ -145,17 +134,10 @@ message:"Registration Successful"
 
 
 
+/* LOGIN */
 
 
-
-
-
-
-// LOGIN
-
-router.post(
-"/login",
-(req,res)=>{
+router.post("/login",(req,res)=>{
 
 
 const {
@@ -170,11 +152,14 @@ const db=loadDB();
 
 
 const user=db.users.find(
-u=>
-u.username===username &&
-u.password===password
-);
 
+u=>
+
+u.username===username &&
+
+u.password===password
+
+);
 
 
 
@@ -193,16 +178,17 @@ message:"Invalid Username or Password"
 
 
 
-
 if(user.status==="blocked"){
+
 
 return res.json({
 
 success:false,
 
-message:"Account Suspended"
+message:"Your account is suspended"
 
 });
+
 
 }
 
@@ -219,8 +205,8 @@ user
 });
 
 
-});
 
+});
 
 
 
