@@ -1,345 +1,207 @@
-import { useEffect, useState } from "react";
+import { useEffect,useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
-const API = "https://venom-server-5dey.onrender.com";
-
+const API="https://venom-server-5dey.onrender.com";
 
 export default function Admin(){
 
-  const [proofs,setProofs]=useState([]);
-  const [coinRequests,setCoinRequests]=useState([]);
+const [proofs,setProofs]=useState([]);
+const [requests,setRequests]=useState([]);
 
+useEffect(()=>{
+loadProofs();
+loadRequests();
+},[]);
 
+async function loadProofs(){
 
-  useEffect(()=>{
+try{
 
-    loadProofs();
-    loadCoins();
+const res=await axios.get(`${API}/admin/proofs`);
 
-  },[]);
+if(res.data.success){
+setProofs(res.data.proofs);
+}
 
+}catch{}
 
+}
 
+async function loadRequests(){
 
-  async function loadProofs(){
+try{
 
-    const res=await axios.get(
-      `${API}/admin/proofs`
-    );
+const res=await axios.get(`${API}/coins/requests`);
 
-    if(res.data.success){
+if(res.data.success){
+setRequests(res.data.requests);
+}
 
-      setProofs(res.data.proofs);
+}catch{}
 
-    }
+}
 
-  }
+async function approveProof(id){
 
+await axios.post(`${API}/admin/approve`,{
+proofId:id
+});
 
+loadProofs();
 
+}
 
+async function rejectProof(id){
 
-  async function approve(id){
+await axios.post(`${API}/admin/reject`,{
+proofId:id
+});
 
-    const res=await axios.post(
-      `${API}/admin/approve`,
-      {proofId:id}
-    );
+loadProofs();
 
-    alert(res.data.message);
+}
 
-    loadProofs();
+async function approveCoin(id){
 
-  }
+await axios.post(`${API}/coins/approve`,{
+id
+});
 
+alert("Coins Added");
 
+loadRequests();
 
+}
 
-  async function reject(id){
+async function rejectCoin(id){
 
-    const res=await axios.post(
-      `${API}/admin/reject`,
-      {proofId:id}
-    );
+await axios.post(`${API}/coins/reject`,{
+id
+});
 
-    alert(res.data.message);
+alert("Rejected");
 
-    loadProofs();
+loadRequests();
 
-  }
-
-
-
-
-
-  async function loadCoins(){
-
-    const res=await axios.get(
-      `${API}/admin/coin-requests`
-    );
-
-
-    if(res.data.success){
-
-      setCoinRequests(
-        res.data.requests
-      );
-
-    }
-
-  }
-
-
-
-
-
-  async function coinApprove(id){
-
-    const res=await axios.post(
-      `${API}/admin/coin-approve`,
-      {id}
-    );
-
-
-    alert(res.data.message);
-
-    loadCoins();
-
-  }
-
-
-
-
-
-  async function coinReject(id){
-
-    const res=await axios.post(
-      `${API}/admin/coin-reject`,
-      {id}
-    );
-
-
-    alert(res.data.message);
-
-    loadCoins();
-
-  }
-
-
-
-
+}
 
 return(
 
-<div style={page}>
+<div style={{
+minHeight:"100vh",
+padding:"20px",
+background:"#111",
+color:"white",
+fontFamily:"Arial"
+}}>
 
-
-<h1 style={{color:"white"}}>
+<h1 style={{textAlign:"center"}}>
 🔐 Admin Panel
 </h1>
 
-
-
-<h2 style={{color:"white"}}>
-📸 Task Proof Requests
-</h2>
-
-
+<h2>📸 Pending Proofs</h2>
 
 {
 proofs.map(p=>(
 
-<div style={card} key={p.id}>
+<div key={p.id} style={{
+background:"#222",
+padding:"15px",
+marginBottom:"15px",
+borderRadius:"15px"
+}}>
 
-<h3>
-👤 {p.username}
-</h3>
-
-<p>
-Campaign ID : {p.campaignId}
-</p>
+<h3>{p.username}</h3>
 
 <img
 src={`${API}/uploads/${p.screenshot}`}
-style={img}
+style={{width:"100%",borderRadius:"10px"}}
+alt=""
 />
 
-
-<div style={row}>
-
-<button
-style={green}
-onClick={()=>approve(p.id)}
->
+<button onClick={()=>approveProof(p.id)}>
 ✅ Approve
 </button>
 
-
 <button
-style={red}
-onClick={()=>reject(p.id)}
+style={{marginLeft:"10px"}}
+onClick={()=>rejectProof(p.id)}
 >
 ❌ Reject
 </button>
-
-
-</div>
-
 
 </div>
 
 ))
 }
 
-
-
-
-<h2 style={{color:"white"}}>
+<h2 style={{marginTop:"35px"}}>
 💰 Coin Payment Requests
 </h2>
 
-
-
-
 {
-coinRequests.map(c=>(
+requests.map(r=>(
 
+<div key={r.id} style={{
+background:"#222",
+padding:"15px",
+marginBottom:"15px",
+borderRadius:"15px"
+}}>
 
-<div style={card} key={c.id}>
+<h3>{r.username}</h3>
 
+<p>Package : {r.packageName}</p>
 
-<h3>
-👤 {c.username}
-</h3>
+<p>Amount : ₹{r.amount}</p>
 
+<p>Status : {r.status}</p>
 
-<p>
-💎 {c.packageName}
-</p>
-
-
-<p>
-💵 ₹{c.amount}
-</p>
-
-
-
-<p>
-📸 Screenshot : {c.screenshot}
-</p>
-
-
-
-<div style={row}>
-
+<p>Screenshot : {r.screenshot}</p>
 
 <button
-style={green}
-onClick={()=>coinApprove(c.id)}
+onClick={()=>approveCoin(r.id)}
 >
-✅ Add Coins
+
+✅ Approve Payment
+
 </button>
 
-
-
 <button
-style={red}
-onClick={()=>coinReject(c.id)}
+style={{marginLeft:"10px"}}
+onClick={()=>rejectCoin(r.id)}
 >
+
 ❌ Reject
+
 </button>
 
-
-
 </div>
-
-
-</div>
-
 
 ))
-
 }
 
+<Link to="/home">
 
+<button style={{
+width:"100%",
+padding:"16px",
+marginTop:"30px",
+borderRadius:"20px",
+border:"none",
+fontSize:"18px",
+fontWeight:"bold"
+}}>
 
+⬅ Back Home
+
+</button>
+
+</Link>
 
 </div>
-
 
 );
 
-
 }
-
-
-
-
-
-const page={
-
-minHeight:"100vh",
-padding:"25px",
-background:"linear-gradient(135deg,#141e30,#243b55)",
-fontFamily:"Arial"
-
-};
-
-
-
-const card={
-
-background:"rgba(255,255,255,0.12)",
-padding:"20px",
-borderRadius:"25px",
-marginBottom:"20px",
-color:"white"
-
-};
-
-
-
-const img={
-
-width:"100%",
-borderRadius:"20px"
-
-};
-
-
-
-const row={
-
-display:"flex",
-gap:"10px",
-marginTop:"15px"
-
-};
-
-
-
-const green={
-
-flex:1,
-padding:"14px",
-borderRadius:"20px",
-border:"none",
-background:"#00c853",
-color:"white",
-fontWeight:"bold"
-
-};
-
-
-
-const red={
-
-flex:1,
-padding:"14px",
-borderRadius:"20px",
-border:"none",
-background:"#d50000",
-color:"white",
-fontWeight:"bold"
-
-};

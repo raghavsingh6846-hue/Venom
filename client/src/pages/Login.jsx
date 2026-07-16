@@ -1,84 +1,69 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import { Preferences } from "@capacitor/preferences";
+import axios from "axios";
 
 const API = "https://venom-server-5dey.onrender.com";
 
-export default function Login() {
+export default function Login(){
 
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [username,setUsername] = useState("");
+  const [password,setPassword] = useState("");
 
-
-  async function login() {
+  async function login(){
 
     if(!username.trim()){
       alert("Enter Username");
       return;
     }
 
+    if(!password){
+      alert("Enter Password");
+      return;
+    }
 
-    try {
-
-      setLoading(true);
-
+    try{
 
       const res = await axios.post(
         `${API}/auth/login`,
-        { username }
+        {
+          username,
+          password
+        }
       );
 
-
       if(res.data.success){
-
 
         await Preferences.set({
           key:"venomUser",
           value:JSON.stringify(res.data.user)
         });
 
-
         localStorage.setItem(
           "venomUser",
           JSON.stringify(res.data.user)
         );
 
-
         navigate("/home");
-
 
       }else{
 
-
         alert(res.data.message);
-
 
       }
 
-
     }catch(err){
 
-
       console.log(err);
-
-      alert("Cannot connect to server");
-
-
-    }finally{
-
-
-      setLoading(false);
-
+      alert("Server Error");
 
     }
 
   }
 
-
-  return (
+  return(
 
     <div
       style={{
@@ -90,7 +75,6 @@ export default function Login() {
         fontFamily:"Arial"
       }}
     >
-
 
       <div
         style={{
@@ -104,91 +88,77 @@ export default function Login() {
         }}
       >
 
+        <h1>Venom 🐍</h1>
 
-        <h1 style={{fontSize:"42px"}}>
-          Venom 🐍
-        </h1>
-
-
-        <p>
-          Social Task Platform
-        </p>
-
-
+        <p>Welcome Back</p>
 
         <input
-          placeholder="Enter Username"
+          placeholder="Username"
           value={username}
           onChange={(e)=>setUsername(e.target.value)}
-          style={{
-            width:"90%",
-            padding:"15px",
-            borderRadius:"15px",
-            border:"none",
-            marginTop:"20px",
-            fontSize:"16px"
-          }}
+          style={input}
         />
 
-
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
+          style={input}
+        />
 
         <button
           onClick={login}
-          disabled={loading}
-          style={{
-            width:"100%",
-            marginTop:"20px",
-            padding:"15px",
-            borderRadius:"20px",
-            border:"none",
-            background:"white",
-            color:"#833ab4",
-            fontSize:"18px",
-            fontWeight:"bold",
-            opacity:loading?0.7:1
-          }}
+          style={button}
         >
-
-          {
-            loading 
-            ? "⏳ Logging in..."
-            : "Login 🚀"
-          }
-
+          Login
         </button>
 
-
-
-        <p>
-          New user?
-        </p>
-
-
-
         <Link to="/register">
-
-          <button
-            style={{
-              width:"100%",
-              padding:"12px",
-              borderRadius:"20px",
-              border:"1px solid white",
-              background:"transparent",
-              color:"white"
-            }}
-          >
+          <button style={registerBtn}>
             Create Account
           </button>
-
         </Link>
 
-
-
       </div>
-
 
     </div>
 
   );
 
 }
+
+const input={
+
+  width:"90%",
+  padding:"15px",
+  marginTop:"15px",
+  borderRadius:"15px",
+  border:"none",
+  outline:"none"
+
+};
+
+const button={
+
+  width:"100%",
+  padding:"15px",
+  marginTop:"20px",
+  borderRadius:"20px",
+  border:"none",
+  fontSize:"18px",
+  fontWeight:"bold"
+
+};
+
+const registerBtn={
+
+  width:"100%",
+  padding:"12px",
+  marginTop:"15px",
+  borderRadius:"20px",
+  border:"1px solid white",
+  background:"transparent",
+  color:"white"
+
+};
