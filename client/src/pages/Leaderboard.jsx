@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
+const API = "https://venom-server-5dey.onrender.com";
+
 export default function Leaderboard() {
 
   const [users, setUsers] = useState([]);
@@ -10,52 +12,121 @@ export default function Leaderboard() {
     loadLeaderboard();
   }, []);
 
+
   async function loadLeaderboard() {
 
     try {
 
       const res = await axios.get(
-        "http://127.0.0.1:3000/leaderboard"
+        `${API}/leaderboard`
       );
 
-      if (res.data.success) {
+      if(res.data.success){
         setUsers(res.data.leaderboard);
       }
 
-    } catch {
+    } catch(err){
 
+      console.log(err);
       alert("Server Error");
 
     }
 
   }
 
+
   return (
 
-    <div style={{ padding:30, textAlign:"center" }}>
+    <div
+      style={{
+        minHeight:"100vh",
+        padding:"25px",
+        background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+        fontFamily:"Arial"
+      }}
+    >
 
-      <h1>Leaderboard</h1>
 
-      <ol style={{ display:"inline-block", textAlign:"left" }}>
+      <h1
+        style={{
+          textAlign:"center",
+          color:"white"
+        }}
+      >
+        🏆 Leaderboard
+      </h1>
 
-        {users.map((user) => (
 
-          <li key={user.id}>
-            {user.username} - {user.coins} Coins
-          </li>
 
-        ))}
+      {
+        users.map((user,index)=>(
 
-      </ol>
+          <div
+            key={user.id}
+            style={card}
+          >
 
-      <br /><br />
+            <h2>
+              {index===0 ? "🥇" :
+               index===1 ? "🥈" :
+               index===2 ? "🥉" :
+               "🏅"}
+              {" "}
+              {user.username}
+            </h2>
+
+
+            <h3>
+              🪙 {user.coins} Coins
+            </h3>
+
+
+          </div>
+
+        ))
+      }
+
+
 
       <Link to="/home">
-        <button>Back Home</button>
+
+        <button style={button}>
+          ⬅ Back Home
+        </button>
+
       </Link>
+
 
     </div>
 
   );
 
 }
+
+
+
+const card={
+
+ background:"rgba(255,255,255,0.18)",
+ backdropFilter:"blur(12px)",
+ borderRadius:"25px",
+ padding:"20px",
+ marginBottom:"15px",
+ color:"white"
+
+};
+
+
+const button={
+
+ width:"100%",
+ marginTop:"20px",
+ padding:"16px",
+ borderRadius:"25px",
+ border:"none",
+ background:"white",
+ color:"#833ab4",
+ fontWeight:"bold",
+ fontSize:"18px"
+
+};

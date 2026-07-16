@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API = "https://venom-server-5dey.onrender.com";
+
 export default function Wallet() {
 
   const loginUser = JSON.parse(localStorage.getItem("venomUser"));
@@ -17,7 +19,7 @@ export default function Wallet() {
     try {
 
       const res = await axios.post(
-        "http://127.0.0.1:3000/auth/login",
+        `${API}/auth/login`,
         {
           username: loginUser.username
         }
@@ -34,8 +36,9 @@ export default function Wallet() {
 
       }
 
-    } catch {
+    } catch (err) {
 
+      console.log(err);
       alert("Server Error");
 
     }
@@ -46,28 +49,117 @@ export default function Wallet() {
     loadWallet();
   }, []);
 
+
   return (
 
-    <div style={{ padding:30, textAlign:"center" }}>
+    <div
+      style={{
+        minHeight:"100vh",
+        padding:"25px",
+        background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+        color:"white",
+        fontFamily:"Arial",
+        textAlign:"center"
+      }}
+    >
 
-      <h1>Wallet</h1>
+      <h1>
+        🪙 Venom Wallet
+      </h1>
 
-      <h2>{user.username}</h2>
 
-      <h3>🪙 Coins : {user.coins}</h3>
+      <div
+        style={{
+          marginTop:"30px",
+          padding:"30px",
+          borderRadius:"30px",
+          background:"rgba(255,255,255,0.18)",
+          backdropFilter:"blur(12px)"
+        }}
+      >
 
-      <h3>❤️ Followers : {user.followers}</h3>
+        <h2>
+          👤 {user.username}
+        </h2>
 
-      <h3>👍 Likes : {user.likes}</h3>
 
-      <br />
+        <h1
+          style={{
+            fontSize:"50px",
+            margin:"20px 0"
+          }}
+        >
+          🪙 {user.coins}
+        </h1>
 
-      <button onClick={loadWallet}>
-        Refresh Wallet
+
+        <p>
+          Total Coins
+        </p>
+
+
+      </div>
+
+
+
+      <div
+        style={{
+          display:"grid",
+          gridTemplateColumns:"1fr 1fr",
+          gap:"15px",
+          marginTop:"25px"
+        }}
+      >
+
+        <div style={card}>
+          ❤️
+          <h2>{user.followers}</h2>
+          Followers
+        </div>
+
+
+        <div style={card}>
+          👍
+          <h2>{user.likes}</h2>
+          Likes
+        </div>
+
+
+      </div>
+
+
+
+      <button
+        onClick={loadWallet}
+        style={{
+          marginTop:"30px",
+          width:"100%",
+          padding:"16px",
+          borderRadius:"25px",
+          border:"none",
+          background:"white",
+          color:"#833ab4",
+          fontSize:"18px",
+          fontWeight:"bold"
+        }}
+      >
+        🔄 Refresh Wallet
       </button>
+
 
     </div>
 
   );
 
 }
+
+
+const card = {
+
+  padding:"20px",
+  borderRadius:"25px",
+  background:"rgba(255,255,255,0.18)",
+  backdropFilter:"blur(10px)",
+  fontSize:"18px"
+
+};

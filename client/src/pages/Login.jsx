@@ -49,27 +49,98 @@ export default function Login() {
 
   return (
 
-    <div style={{ padding:30, textAlign:"center" }}>
+    <div
+      style={{
+        minHeight:"100vh",
+        display:"flex",
+        justifyContent:"center",
+        alignItems:"center",
+        background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+        fontFamily:"Arial"
+      }}
+    >
 
-      <h1>Venom</h1>
+      <div
+        style={{
+          width:"320px",
+          padding:"35px",
+          borderRadius:"30px",
+          background:"rgba(255,255,255,0.18)",
+          backdropFilter:"blur(12px)",
+          textAlign:"center",
+          color:"white"
+        }}
+      >
 
-      <input
-        placeholder="Username"
-        value={username}
-        onChange={(e)=>setUsername(e.target.value)}
-      />
+        <h1 style={{
+          fontSize:"42px",
+          marginBottom:"5px"
+        }}>
+          Venom 🐍
+        </h1>
 
-      <br /><br />
+        <p>
+          Social Task Platform
+        </p>
 
-      <button onClick={login}>
-        Login
-      </button>
 
-      <p>
+        <input
+          placeholder="Enter Username"
+          value={username}
+          onChange={(e)=>setUsername(e.target.value)}
+          style={{
+            width:"90%",
+            padding:"15px",
+            borderRadius:"15px",
+            border:"none",
+            marginTop:"20px",
+            fontSize:"16px",
+            outline:"none"
+          }}
+        />
+
+
+        <button
+          onClick={login}
+          style={{
+            width:"100%",
+            marginTop:"20px",
+            padding:"15px",
+            borderRadius:"20px",
+            border:"none",
+            background:"white",
+            color:"#833ab4",
+            fontSize:"18px",
+            fontWeight:"bold"
+          }}
+        >
+          Login 🚀
+        </button>
+
+
+        <p style={{marginTop:"25px"}}>
+          New user?
+        </p>
+
+
         <Link to="/register">
-          Register
+          <button
+            style={{
+              width:"100%",
+              padding:"12px",
+              borderRadius:"20px",
+              border:"1px solid white",
+              background:"transparent",
+              color:"white",
+              fontSize:"16px"
+            }}
+          >
+            Create Account
+          </button>
         </Link>
-      </p>
+
+
+      </div>
 
     </div>
 

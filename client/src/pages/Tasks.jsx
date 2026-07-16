@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API = "https://venom-server-5dey.onrender.com";
+
 export default function Tasks() {
 
   const loginUser = JSON.parse(localStorage.getItem("venomUser"));
@@ -12,39 +14,43 @@ export default function Tasks() {
     loadCampaigns();
   }, []);
 
+
   async function loadCampaigns() {
 
     try {
 
       const res = await axios.get(
-        "http://127.0.0.1:3000/tasks",
+        `${API}/tasks`,
         {
-          params: {
+          params:{
             username: loginUser.username
           }
         }
       );
 
-      if (res.data.success) {
+      if(res.data.success){
         setCampaigns(res.data.tasks);
       }
 
-    } catch {
+    } catch(err){
 
+      console.log(err);
       alert("Server Error");
 
     }
 
   }
 
-  async function uploadProof(campaignId) {
+
+  async function uploadProof(campaignId){
 
     const file = selectedFiles[campaignId];
 
-    if (!file) {
+    if(!file){
       alert("Please Select Screenshot");
       return;
     }
+
 
     const formData = new FormData();
 
@@ -52,105 +58,205 @@ export default function Tasks() {
     formData.append("campaignId", campaignId);
     formData.append("screenshot", file);
 
-    try {
+
+    try{
 
       const res = await axios.post(
-        "http://127.0.0.1:3000/proof/upload",
+        `${API}/proof/upload`,
         formData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data"
+          headers:{
+            "Content-Type":"multipart/form-data"
           }
         }
       );
+
 
       alert(res.data.message);
 
       loadCampaigns();
 
-    } catch {
 
+    }catch(err){
+
+      console.log(err);
       alert("Upload Failed");
 
     }
 
   }
 
+
   return (
 
-    <div style={{ padding:30 }}>
+    <div
+      style={{
+        minHeight:"100vh",
+        padding:"20px",
+        background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+        fontFamily:"Arial"
+      }}
+    >
 
-      <h1>Tasks</h1>
+      <h1
+        style={{
+          color:"white",
+          textAlign:"center"
+        }}
+      >
+        🚀 Available Tasks
+      </h1>
 
-      {campaigns.length === 0 ? (
 
-        <h3>No Task Available</h3>
 
-      ) : (
+      {
+        campaigns.length===0 ? (
 
-        campaigns.map((c)=>(
+          <h3 style={{color:"white",textAlign:"center"}}>
+            No Task Available
+          </h3>
 
-          <div
-            key={c.id}
-            style={{
-              border:"1px solid gray",
-              borderRadius:"10px",
-              padding:"15px",
-              marginBottom:"20px"
-            }}
-          >
+        ) : (
 
-            <h3>{c.type}</h3>
 
-            <p>👤 {c.username}</p>
+          campaigns.map((c)=>(
 
-            <p>🪙 Reward : {c.reward} Coins</p>
 
-            <p>📦 Remaining : {c.quantity}</p>
-
-            {c.type === "Comment" && (
-              <p>💬 {c.commentText}</p>
-            )}
-
-            <a
-              href={c.link}
-              target="_blank"
-              rel="noreferrer"
+            <div
+              key={c.id}
+              style={card}
             >
-              <button>
-                Open Instagram
-              </button>
-            </a>
 
-            <br /><br />
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e)=>
-                setSelectedFiles({
-                  ...selectedFiles,
-                  [c.id]: e.target.files[0]
-                })
+              <div style={badge}>
+                {c.type}
+              </div>
+
+
+              <h2>
+                👤 {c.username}
+              </h2>
+
+
+              <h2>
+                🪙 {c.reward} Coins
+              </h2>
+
+
+              <p>
+                📦 Remaining : {c.quantity}
+              </p>
+
+
+              {
+                c.type==="Comment" &&
+                <p>
+                  💬 {c.commentText}
+                </p>
               }
-            />
 
-            <br /><br />
 
-            <button
-              onClick={()=>uploadProof(c.id)}
-            >
-              Upload Proof
-            </button>
 
-          </div>
+              <a
+                href={c.link}
+                target="_blank"
+                rel="noreferrer"
+              >
 
-        ))
+                <button style={btn}>
+                  📱 Open Instagram
+                </button>
 
-      )}
+              </a>
+
+
+
+              <input
+                style={{marginTop:"20px"}}
+                type="file"
+                accept="image/*"
+                onChange={(e)=>
+                  setSelectedFiles({
+                    ...selectedFiles,
+                    [c.id]:e.target.files[0]
+                  })
+                }
+              />
+
+
+              <button
+                style={uploadBtn}
+                onClick={()=>uploadProof(c.id)}
+              >
+                📸 Upload Proof
+              </button>
+
+
+            </div>
+
+
+          ))
+
+        )
+      }
+
 
     </div>
 
   );
 
 }
+
+
+
+const card={
+
+ background:"rgba(255,255,255,0.18)",
+ backdropFilter:"blur(12px)",
+ borderRadius:"25px",
+ padding:"25px",
+ marginBottom:"20px",
+ color:"white"
+
+};
+
+
+const badge={
+
+ display:"inline-block",
+ padding:"8px 18px",
+ borderRadius:"20px",
+ background:"white",
+ color:"#833ab4",
+ fontWeight:"bold"
+
+};
+
+
+const btn={
+
+ width:"100%",
+ padding:"15px",
+ borderRadius:"20px",
+ border:"none",
+ background:"white",
+ color:"#833ab4",
+ fontWeight:"bold",
+ fontSize:"16px"
+
+};
+
+
+const uploadBtn={
+
+ width:"100%",
+ marginTop:"15px",
+ padding:"15px",
+ borderRadius:"20px",
+ border:"none",
+ background:"#833ab4",
+ color:"white",
+ fontWeight:"bold",
+ fontSize:"16px"
+
+};
