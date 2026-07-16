@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
+const API = "https://venom-server-5dey.onrender.com";
+
 export default function Login() {
 
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ export default function Login() {
     try {
 
       const res = await axios.post(
-        "http://127.0.0.1:3000/auth/login",
+        `${API}/auth/login`,
         { username }
       );
 
@@ -31,9 +33,15 @@ export default function Login() {
 
       }
 
-    } catch {
+    } catch (err) {
 
-      alert("Server Error");
+      console.log(err);
+
+      if (err.response) {
+        alert(err.response.data.message || "Server Error");
+      } else {
+        alert("Cannot connect to server");
+      }
 
     }
 
