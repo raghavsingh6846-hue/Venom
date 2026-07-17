@@ -1,12 +1,61 @@
+
 import { Link } from "react-router-dom";
 import { Preferences } from "@capacitor/preferences";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
+const API="https://venom-server-5dey.onrender.com";
 
 export default function Home(){
 
-const user = JSON.parse(
-localStorage.getItem("venomUser")
+const [user,setUser]=useState(null);
+
+useEffect(()=>{
+
+loadUser();
+
+},[]);
+
+
+async function loadUser(){
+
+const data=await Preferences.get({
+key:"venomUser"
+});
+
+if(!data.value) return;
+
+const localUser=JSON.parse(data.value);
+
+try{
+
+const res=await axios.get(
+`${API}/wallet/user/${localUser.username}`
 );
+
+if(res.data.success){
+
+setUser(res.data.user);
+
+await Preferences.set({
+key:"venomUser",
+value:JSON.stringify(res.data.user)
+});
+
+localStorage.setItem(
+"venomUser",
+JSON.stringify(res.data.user)
+);
+
+}
+
+}catch{
+
+setUser(localUser);
+
+}
+
+}
 
 
 async function logout(){
@@ -21,7 +70,6 @@ window.location.href="/";
 
 }
 
-
 return(
 
 <div style={page}>
@@ -30,30 +78,19 @@ return(
 Venom 🐍
 </h1>
 
-
 <div style={profile}>
 
-<h2>
-Welcome 👋
-</h2>
+<h2>Welcome 👋</h2>
 
-<h2>
-{user ? user.username : "Guest"}
-</h2>
+<h2>{user?user.username:"Guest"}</h2>
 
-<h1>
-🪙 {user ? user.coins : 0}
-</h1>
+<h1>🪙 {user?user.coins:0}</h1>
 
-<p>
-Your Coins
-</p>
+<p>Available Coins</p>
 
 </div>
 
-
 <div style={menu}>
-
 
 <Link to="/tasks">
 <button style={btn}>
@@ -61,13 +98,11 @@ Your Coins
 </button>
 </Link>
 
-
-<Link to="/wallet">
+<Link to="/orders">
 <button style={btn}>
-🪙 Wallet
+📦 My Orders
 </button>
 </Link>
-
 
 <Link to="/buycoins">
 <button style={btn}>
@@ -75,13 +110,11 @@ Your Coins
 </button>
 </Link>
 
-
 <Link to="/campaign">
 <button style={btn}>
 📢 Create Campaign
 </button>
 </Link>
-
 
 <Link to="/leaderboard">
 <button style={btn}>
@@ -89,13 +122,11 @@ Your Coins
 </button>
 </Link>
 
-
 <Link to="/admin-login">
 <button style={adminBtn}>
 🔐 Admin Panel
 </button>
 </Link>
-
 
 <button
 style={btn}
@@ -104,7 +135,6 @@ onClick={logout}
 🚪 Logout
 </button>
 
-
 </div>
 
 </div>
@@ -112,8 +142,6 @@ onClick={logout}
 );
 
 }
-
-
 
 const page={
 minHeight:"100vh",
@@ -124,11 +152,9 @@ color:"white",
 fontFamily:"Arial"
 };
 
-
 const title={
 fontSize:"42px"
 };
-
 
 const profile={
 background:"rgba(255,255,255,0.15)",
@@ -138,12 +164,10 @@ padding:"30px",
 marginBottom:"30px"
 };
 
-
 const menu={
 display:"grid",
 gap:"15px"
 };
-
 
 const btn={
 width:"100%",
@@ -155,7 +179,6 @@ color:"#833ab4",
 fontSize:"18px",
 fontWeight:"bold"
 };
-
 
 const adminBtn={
 width:"100%",

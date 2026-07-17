@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1784090725830,
+    "username": "Raj123",
+    "password": "",
+    "coins": 42,
+    "followers": 0,
+    "likes": 0,
+    "trustScore": 100,
+    "tasksCompleted": 0,
+    "ordersCreated": 0,
+    "status": "active"
+  },
+  {
+    "id": 1784110352173,
+    "username": "Rohan77",
+    "password": "",
+    "coins": 16,
+    "followers": 0,
+    "likes": 0,
+    "trustScore": 108,
+    "tasksCompleted": 0,
+    "ordersCreated": 0,
+    "status": "active"
+  }
+]

@@ -5,7 +5,7 @@ import { Preferences } from "@capacitor/preferences";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-import Wallet from "./pages/Wallet";
+import MyOrders from "./pages/MyOrders";
 import Campaign from "./pages/Campaign";
 import Leaderboard from "./pages/Leaderboard";
 import Tasks from "./pages/Tasks";
@@ -15,18 +15,18 @@ import BuyCoins from "./pages/BuyCoins";
 
 function Start() {
 
-  const [loading,setLoading]=useState(true);
-  const [user,setUser]=useState(null);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    async function checkUser(){
+    async function checkUser() {
 
-      const data=await Preferences.get({
-        key:"venomUser"
+      const data = await Preferences.get({
+        key: "venomUser"
       });
 
-      if(data.value){
+      if (data.value) {
         setUser(JSON.parse(data.value));
       }
 
@@ -36,16 +36,18 @@ function Start() {
 
     checkUser();
 
-  },[]);
+  }, []);
 
-  if(loading){
+  if (loading) {
 
-    return(
-      <div style={{
-        textAlign:"center",
-        marginTop:"100px",
-        fontSize:"25px"
-      }}>
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "100px",
+          fontSize: "25px"
+        }}
+      >
         Loading Venom 🐍...
       </div>
     );
@@ -53,9 +55,9 @@ function Start() {
   }
 
   const isAdmin =
-    localStorage.getItem("venomAdmin")==="true";
+    localStorage.getItem("venomAdmin") === "true";
 
-  return(
+  return (
 
     <Routes>
 
@@ -63,31 +65,31 @@ function Start() {
         path="/"
         element={
           user
-          ? <Navigate to="/home"/>
-          : <Login/>
+            ? <Navigate to="/home" />
+            : <Login />
         }
       />
 
-      <Route path="/login" element={<Login/>}/>
-      <Route path="/register" element={<Register/>}/>
-      <Route path="/home" element={<Home/>}/>
-      <Route path="/wallet" element={<Wallet/>}/>
-      <Route path="/tasks" element={<Tasks/>}/>
-      <Route path="/campaign" element={<Campaign/>}/>
-      <Route path="/leaderboard" element={<Leaderboard/>}/>
-      <Route path="/buycoins" element={<BuyCoins/>}/>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/orders" element={<MyOrders />} />
+      <Route path="/tasks" element={<Tasks />} />
+      <Route path="/campaign" element={<Campaign />} />
+      <Route path="/leaderboard" element={<Leaderboard />} />
+      <Route path="/buycoins" element={<BuyCoins />} />
 
       <Route
         path="/admin-login"
-        element={<AdminLogin/>}
+        element={<AdminLogin />}
       />
 
       <Route
         path="/admin"
         element={
           isAdmin
-          ? <Admin/>
-          : <Navigate to="/admin-login"/>
+            ? <Admin />
+            : <Navigate to="/admin-login" />
         }
       />
 
@@ -97,12 +99,12 @@ function Start() {
 
 }
 
-export default function App(){
+export default function App() {
 
-  return(
+  return (
 
     <BrowserRouter>
-      <Start/>
+      <Start />
     </BrowserRouter>
 
   );
