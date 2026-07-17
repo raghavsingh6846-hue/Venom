@@ -15,7 +15,6 @@ fs.readFileSync(DB,"utf8")
 }
 
 
-
 function saveDB(data){
 
 fs.writeFileSync(
@@ -39,19 +38,17 @@ res.json({
 
 success:true,
 
-users:db.users.map(u=>({
+users:(db.users || []).map(u=>({
 
 id:u.id,
 
 username:u.username,
 
-coins:u.coins,
+coins:u.coins || 0,
 
 trustScore:u.trustScore || 100,
 
 tasksCompleted:u.tasksCompleted || 0,
-
-status:u.status || "active",
 
 createdAt:u.createdAt
 
@@ -66,64 +63,9 @@ createdAt:u.createdAt
 
 
 
-/* BLOCK USER */
+/* DELETE USER COMPLETELY */
 
-
-router.post("/block",(req,res)=>{
-
-
-const {id}=req.body;
-
-
-const db=loadDB();
-
-
-
-const user=db.users.find(
-u=>u.id==id
-);
-
-
-
-if(user){
-
-user.status="blocked";
-
-saveDB(db);
-
-
-return res.json({
-
-success:true,
-
-message:"User Blocked"
-
-});
-
-}
-
-
-
-res.json({
-
-success:false,
-
-message:"User not found"
-
-});
-
-
-});
-
-
-
-
-
-
-/* UNBLOCK USER */
-
-
-router.post("/unblock",(req,res)=>{
+router.post("/delete-user",(req,res)=>{
 
 
 const {id}=req.body;
@@ -139,38 +81,70 @@ u=>u.id==id
 
 
 
-if(user){
+if(!user){
 
-user.status="active";
+return res.json({
+
+success:false,
+
+message:"User Not Found"
+
+});
+
+}
+
+
+
+
+
+// delete user
+
+db.users =
+db.users.filter(
+u=>u.id!=id
+);
+
+
+
+
+
+// delete user's campaigns
+
+db.campaigns =
+(db.campaigns || []).filter(
+c=>c.username!==user.username
+);
+
+
+
+
+
+// delete user's proofs
+
+db.proofs =
+(db.proofs || []).filter(
+p=>p.username!==user.username
+);
+
+
+
 
 
 saveDB(db);
 
 
 
-return res.json({
+res.json({
 
 success:true,
 
-message:"User Unblocked"
-
-});
-
-
-}
-
-
-
-res.json({
-
-success:false,
-
-message:"User not found"
+message:"User Deleted Successfully"
 
 });
 
 
 });
+
 
 
 

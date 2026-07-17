@@ -99,18 +99,6 @@
       "commentText": "",
       "completed": [],
       "status": "Active"
-    },
-    {
-      "id": 1784173931127,
-      "username": "Raj123",
-      "type": "Follow",
-      "title": "Follow Task",
-      "link": "",
-      "reward": 2,
-      "quantity": 1,
-      "commentText": "",
-      "completed": [],
-      "status": "Active"
     }
   ],
   "tasks": [],

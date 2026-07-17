@@ -53,28 +53,48 @@ console.log(err);
 
 
 
-async function loadPayments(){
+async function deleteUser(id){
+
+if(!confirm("Delete this user permanently?"))
+return;
+
 
 try{
+
+const res=await axios.post(
+`${API}/admin/delete-user`,
+{id}
+);
+
+
+alert(res.data.message);
+
+loadUsers();
+
+
+}catch{
+
+alert("Server Error");
+
+}
+
+}
+
+
+
+
+
+
+async function loadPayments(){
 
 const res=await axios.get(
 `${API}/coins/requests`
 );
 
-if(res.data.success){
-
+if(res.data.success)
 setRequests(res.data.requests);
 
 }
-
-}catch(err){
-
-console.log(err);
-
-}
-
-}
-
 
 
 
@@ -82,27 +102,14 @@ console.log(err);
 
 async function loadProofs(){
 
-try{
-
 const res=await axios.get(
 `${API}/proof/pending`
 );
 
-if(res.data.success){
-
+if(res.data.success)
 setProofs(res.data.proofs);
 
 }
-
-}catch(err){
-
-console.log(err);
-
-}
-
-}
-
-
 
 
 
@@ -110,59 +117,20 @@ console.log(err);
 
 async function loadCampaigns(){
 
-try{
-
 const res=await axios.get(
 `${API}/campaign/admin/all`
 );
 
-if(res.data.success){
-
+if(res.data.success)
 setCampaigns(res.data.campaigns);
 
 }
 
-}catch(err){
-
-console.log(err);
-
-}
-
-}
 
 
 
 
-
-
-async function blockUser(id){
-
-await axios.post(
-`${API}/admin/block`,
-{id}
-);
-
-loadUsers();
-
-}
-
-
-
-
-
-
-async function unblockUser(id){
-
-await axios.post(
-`${API}/admin/unblock`,
-{id}
-);
-
-loadUsers();
-
-}async function approvePayment(id){
-
-try{
+async function approvePayment(id){
 
 const res=await axios.post(
 `${API}/coins/approve`,
@@ -173,12 +141,6 @@ alert(res.data.message);
 
 loadPayments();
 
-}catch{
-
-alert("Server Error");
-
-}
-
 }
 
 
@@ -186,8 +148,6 @@ alert("Server Error");
 
 
 async function rejectPayment(id){
-
-try{
 
 const res=await axios.post(
 `${API}/coins/reject`,
@@ -198,12 +158,6 @@ alert(res.data.message);
 
 loadPayments();
 
-}catch{
-
-alert("Server Error");
-
-}
-
 }
 
 
@@ -211,8 +165,6 @@ alert("Server Error");
 
 
 async function approveProof(id){
-
-try{
 
 const res=await axios.post(
 `${API}/proof/approve`,
@@ -223,12 +175,6 @@ alert(res.data.message);
 
 loadProofs();
 
-}catch{
-
-alert("Server Error");
-
-}
-
 }
 
 
@@ -236,8 +182,6 @@ alert("Server Error");
 
 
 async function rejectProof(id){
-
-try{
 
 const res=await axios.post(
 `${API}/proof/reject`,
@@ -248,12 +192,6 @@ alert(res.data.message);
 
 loadProofs();
 
-}catch{
-
-alert("Server Error");
-
-}
-
 }
 
 
@@ -261,8 +199,6 @@ alert("Server Error");
 
 
 async function deleteCampaign(id){
-
-try{
 
 const res=await axios.post(
 `${API}/campaign/admin/delete`,
@@ -273,25 +209,17 @@ alert(res.data.message);
 
 loadCampaigns();
 
-}catch{
-
-alert("Server Error");
-
 }
 
-}return (
 
-<div style={{
-minHeight:"100vh",
-padding:"20px",
-background:"#111",
-color:"white",
-fontFamily:"Arial"
-}}>
 
-<h1 style={{textAlign:"center"}}>
-🔐 Venom Admin Panel
-</h1>
+
+
+return(
+
+<div style={page}>
+
+<h1>🔐 Venom Admin Panel</h1>
 
 
 <h2>👥 Users</h2>
@@ -310,31 +238,13 @@ users.map(u=>(
 
 <p>📋 Tasks : {u.tasksCompleted}</p>
 
-<p>Status : {u.status}</p>
-
-
-{
-u.status==="blocked"
-
-?
-
-<button
-style={green}
-onClick={()=>unblockUser(u.id)}
->
-✅ Unblock
-</button>
-
-:
 
 <button
 style={red}
-onClick={()=>blockUser(u.id)}
+onClick={()=>deleteUser(u.id)}
 >
-🚫 Block
+🗑 Delete User
 </button>
-
-}
 
 
 </div>
@@ -342,6 +252,7 @@ onClick={()=>blockUser(u.id)}
 ))
 
 }
+
 
 
 
@@ -362,11 +273,8 @@ requests.map(r=>(
 
 
 <img
-
 src={`${API}/uploads/${r.screenshot}`}
-
 style={img}
-
 />
 
 
@@ -395,6 +303,7 @@ onClick={()=>rejectPayment(r.id)}
 
 
 
+
 <h2>📸 Task Proof Requests</h2>
 
 
@@ -412,11 +321,8 @@ proofs.map(p=>(
 
 
 <img
-
 src={`${API}/uploads/${p.screenshot}`}
-
 style={img}
-
 />
 
 
@@ -437,7 +343,6 @@ onClick={()=>rejectProof(p.id)}
 
 
 </div>
-
 
 ))
 
@@ -463,15 +368,10 @@ campaigns.map(c=>(
 
 
 <button
-
 style={red}
-
 onClick={()=>deleteCampaign(c.id)}
-
 >
-
 🗑 Delete Campaign
-
 </button>
 
 
@@ -484,12 +384,11 @@ onClick={()=>deleteCampaign(c.id)}
 
 
 
+
 <Link to="/home">
 
 <button style={back}>
-
 ⬅ Back Home
-
 </button>
 
 </Link>
@@ -502,6 +401,17 @@ onClick={()=>deleteCampaign(c.id)}
 }
 
 
+
+
+const page={
+
+minHeight:"100vh",
+padding:"20px",
+background:"#111",
+color:"white",
+fontFamily:"Arial"
+
+};
 
 
 const card={

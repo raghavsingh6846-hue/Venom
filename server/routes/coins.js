@@ -74,6 +74,7 @@ JSON.stringify(data,null,2)
 
 
 
+
 // USER PAYMENT REQUEST
 
 router.post(
@@ -89,31 +90,7 @@ amount
 }=req.body;
 
 
-
 const requests=loadRequests();
-
-
-
-const already = requests.find(
-r =>
-r.username===username &&
-r.packageName===packageName &&
-r.status==="Pending"
-);
-
-
-
-if(already){
-
-return res.json({
-
-success:false,
-
-message:"Payment Already Submitted"
-
-});
-
-}
 
 
 
@@ -128,7 +105,7 @@ packageName,
 amount:Number(amount),
 
 screenshot:req.file
-? req.file.filename
+?req.file.filename
 :"",
 
 status:"Pending",
@@ -140,6 +117,7 @@ createdAt:new Date().toISOString()
 
 
 requests.push(request);
+
 
 saveRequests(requests);
 
@@ -192,6 +170,7 @@ r=>r.status==="Pending"
 
 
 
+
 // ADMIN APPROVE
 
 router.post(
@@ -203,7 +182,6 @@ const {id}=req.body;
 
 
 const requests=loadRequests();
-
 
 
 const request=requests.find(
@@ -219,20 +197,6 @@ return res.json({
 success:false,
 
 message:"Request Not Found"
-
-});
-
-}
-
-
-
-if(request.status==="Approved"){
-
-return res.json({
-
-success:false,
-
-message:"Already Approved"
 
 });
 
@@ -265,15 +229,17 @@ message:"User Not Found"
 
 
 
+
 const coinsMap={
 
-"50 Coins":50,
+"20 Coins":70,
 
-"100 Coins":100,
+"50 Coins":180,
 
-"320 Coins":320
+"100 Coins":400
 
 };
+
 
 
 
@@ -315,6 +281,7 @@ message:`${coins} Coins Added`
 
 
 
+
 // ADMIN REJECT
 
 router.post(
@@ -325,9 +292,7 @@ router.post(
 const {id}=req.body;
 
 
-
 const requests=loadRequests();
-
 
 
 const request=requests.find(
@@ -341,7 +306,6 @@ if(request){
 request.status="Rejected";
 
 saveRequests(requests);
-
 
 
 return res.json({
@@ -366,6 +330,7 @@ message:"Request Not Found"
 
 
 });
+
 
 
 
