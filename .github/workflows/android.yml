@@ -6,30 +6,41 @@ on:
       - main
       - master
       - campaign-v1
+      - mongodb-v5
+
   workflow_dispatch:
 
+
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
 
     defaults:
       run:
         working-directory: client
 
+
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
+
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
+
       - name: Install packages
         run: npm install
 
+
       - name: Build React
         run: npm run build
+
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -37,14 +48,17 @@ jobs:
           distribution: temurin
           java-version: 21
 
+
       - name: Capacitor Sync
         run: npx cap sync android
+
 
       - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
