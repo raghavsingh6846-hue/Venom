@@ -1,9 +1,10 @@
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 
 const router = express.Router();
 
-const DB="./db.json";
+const DB = path.join(__dirname,"../db.json");
 
 
 function loadDB(){
@@ -68,6 +69,9 @@ createdAt:u.createdAt
 router.post("/delete-user",(req,res)=>{
 
 
+try{
+
+
 const {id}=req.body;
 
 
@@ -96,7 +100,6 @@ message:"User Not Found"
 
 
 
-
 // delete user
 
 db.users =
@@ -107,8 +110,7 @@ u=>u.id!=id
 
 
 
-
-// delete user's campaigns
+// delete campaigns
 
 db.campaigns =
 (db.campaigns || []).filter(
@@ -118,8 +120,7 @@ c=>c.username!==user.username
 
 
 
-
-// delete user's proofs
+// delete proofs
 
 db.proofs =
 (db.proofs || []).filter(
@@ -127,6 +128,14 @@ p=>p.username!==user.username
 );
 
 
+
+
+// delete coin requests
+
+db.coin_requests =
+(db.coin_requests || []).filter(
+r=>r.username!==user.username
+);
 
 
 
@@ -141,6 +150,25 @@ success:true,
 message:"User Deleted Successfully"
 
 });
+
+
+}catch(err){
+
+
+console.log(err);
+
+
+res.json({
+
+success:false,
+
+message:"Server Error"
+
+});
+
+
+}
+
 
 
 });

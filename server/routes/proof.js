@@ -57,6 +57,9 @@ upload.single("screenshot"),
 (req,res)=>{
 
 
+try{
+
+
 const {
 username,
 campaignId,
@@ -64,12 +67,42 @@ type
 }=req.body;
 
 
+
 const db=loadDB();
+
+
+
+/* DUPLICATE PROOF CHECK */
+
+const already = (db.proofs || []).find(
+p =>
+p.username===username &&
+p.campaignId==campaignId &&
+p.status==="Pending"
+);
+
+
+
+if(already){
+
+return res.json({
+
+success:false,
+
+message:"Proof Already Submitted"
+
+});
+
+}
+
+
+
 
 
 const campaign=db.campaigns.find(
 c=>c.id==campaignId
 );
+
 
 
 let reward=0;
@@ -80,6 +113,7 @@ if(campaign){
 reward=campaign.reward;
 
 }
+
 
 
 
@@ -96,7 +130,7 @@ type,
 reward,
 
 screenshot:req.file
-? req.file.filename
+?req.file.filename
 :"",
 
 status:"Pending",
@@ -114,6 +148,7 @@ db.proofs=[];
 }
 
 
+
 db.proofs.push(proof);
 
 
@@ -128,6 +163,22 @@ success:true,
 message:"Screenshot Submitted"
 
 });
+
+
+
+}catch(err){
+
+console.log(err);
+
+res.json({
+
+success:false,
+
+message:"Server Error"
+
+});
+
+}
 
 
 });
@@ -201,6 +252,19 @@ message:"Proof Not Found"
 
 
 
+if(proof.status!=="Pending"){
+
+return res.json({
+
+success:false,
+
+message:"Already Processed"
+
+});
+
+}
+
+
 
 const user=db.users.find(
 u=>u.username===proof.username
@@ -214,37 +278,25 @@ c=>c.id==proof.campaignId
 
 
 
-// OLD PROOFS FIX
-
-if(!proof.reward && campaign){
-
-proof.reward=campaign.reward;
-
-}
-
-
 
 if(user){
 
 user.coins =
-(user.coins || 0)+proof.reward;
+(user.coins||0)+proof.reward;
 
 
 user.tasksCompleted =
-(user.tasksCompleted || 0)+1;
+(user.tasksCompleted||0)+1;
 
 
 user.trustScore =
-(user.trustScore || 100)+1;
+(user.trustScore||100)+1;
 
 }
 
 
 
-
-
 if(campaign){
-
 
 campaign.quantity=Math.max(
 0,
@@ -252,13 +304,11 @@ campaign.quantity-1
 );
 
 
-
 if(!campaign.completed){
 
 campaign.completed=[];
 
 }
-
 
 
 if(!campaign.completed.includes(
@@ -272,16 +322,13 @@ proof.username
 }
 
 
-
 if(campaign.quantity===0){
 
 campaign.status="Completed";
 
 }
 
-
 }
-
 
 
 
@@ -345,20 +392,6 @@ message:"Proof Not Found"
 
 
 proof.status="Rejected";
-
-
-const user=db.users.find(
-u=>u.username===proof.username
-);
-
-
-if(user){
-
-user.trustScore =
-(user.trustScore||100)-1;
-
-}
-
 
 
 saveDB(db);
