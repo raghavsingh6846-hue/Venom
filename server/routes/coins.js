@@ -232,11 +232,11 @@ message:"User Not Found"
 
 const coinsMap={
 
-"20 Coins":70,
+"70 Coins":70,
 
-"50 Coins":180,
+"180 Coins":180,
 
-"100 Coins":400
+"400 Coins":400
 
 };
 
