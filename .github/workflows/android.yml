@@ -1,4 +1,4 @@
-/xname: Build Venom APK
+name: Build Venom APK
 
 on:
   push:
@@ -17,30 +17,37 @@ jobs:
         working-directory: client
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - run: npm install
+      - name: Install packages
+        run: npm install
 
-      - run: npm run build
+      - name: Build React
+        run: npm run build
 
-      - run: npx cap sync android
-
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - run: chmod +x android/gradlew
+      - name: Capacitor Sync
+        run: npx cap sync android
 
-      - run: |
+      - name: Build APK
+        run: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleDebug
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: Venom-Debug-APK
           path: client/android/app/build/outputs/apk/debug/app-debug.apk
