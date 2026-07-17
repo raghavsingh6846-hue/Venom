@@ -1,6 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+
+const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/auth");
 const walletRoutes = require("./routes/wallet");
@@ -13,6 +16,8 @@ const coinsRoutes = require("./routes/coins");
 const ordersRoutes = require("./routes/orders");
 
 const app = express();
+
+connectDB();
 
 app.use(cors());
 app.use(express.json());

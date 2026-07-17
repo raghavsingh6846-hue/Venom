@@ -5,210 +5,160 @@ const router = express.Router();
 
 const DB = "./db.json";
 
-
-function loadDB(){
-
-return JSON.parse(
-fs.readFileSync(DB,"utf8")
-);
-
+function loadDB() {
+  return JSON.parse(
+    fs.readFileSync(DB, "utf8")
+  );
 }
 
-
-function saveDB(data){
-
-fs.writeFileSync(
-DB,
-JSON.stringify(data,null,2)
-);
-
+function saveDB(data) {
+  fs.writeFileSync(
+    DB,
+    JSON.stringify(data, null, 2)
+  );
 }
-
-
 
 /* REGISTER */
 
+router.post("/register", (req, res) => {
 
-router.post("/register",(req,res)=>{
+  const {
+    username,
+    password
+  } = req.body;
 
+  if (!username || !password) {
 
-const {
-username,
-password
-}=req.body;
+    return res.json({
+      success: false,
+      message: "Username and Password Required"
+    });
 
+  }
 
+  const db = loadDB();
 
-if(!username || !password){
+  const exists = db.users.find(
+    u => u.username.toLowerCase() === username.toLowerCase()
+  );
 
-return res.json({
+  if (exists) {
 
-success:false,
-message:"Username and Password Required"
+    return res.json({
+      success: false,
+      message: "Username Already Exists"
+    });
 
-});
+  }
 
-}
+  const user = {
 
+    id: Date.now(),
 
+    username,
 
-const db=loadDB();
+    password,
 
+    coins: 0,
 
+    followers: 0,
 
-const exists=db.users.find(
-u=>u.username===username
-);
+    likes: 0,
 
+    trustScore: 100,
 
+    tasksCompleted: 0,
 
-if(exists){
+    status: "active",
 
-return res.json({
+    createdAt: new Date().toISOString()
 
-success:false,
-message:"Username already exists"
+  };
 
-});
+  db.users.push(user);
 
-}
+  saveDB(db);
 
+  res.json({
 
+    success: true,
 
-const user={
+    message: "Registration Successful"
 
-
-id:Date.now(),
-
-username,
-
-password,
-
-
-coins:0,
-
-followers:0,
-
-likes:0,
-
-
-trustScore:100,
-
-rejectCount:0,
-
-
-tasksCompleted:0,
-
-payments:0,
-
-
-status:"active",
-
-
-createdAt:new Date()
-
-};
-
-
-
-db.users.push(user);
-
-
-
-saveDB(db);
-
-
-
-res.json({
-
-success:true,
-
-message:"Registration Successful"
+  });
 
 });
-
-
-});
-
-
-
 
 
 /* LOGIN */
 
+router.post("/login", (req, res) => {
 
-router.post("/login",(req,res)=>{
+  const {
+    username,
+    password
+  } = req.body;
 
+  const db = loadDB();
 
-const {
-username,
-password
-}=req.body;
+  const user = db.users.find(
+    u =>
+      u.username === username &&
+      u.password === password
+  );
 
+  if (!user) {
 
+    return res.json({
 
-const db=loadDB();
+      success: false,
 
+      message: "Invalid Username or Password"
 
+    });
 
-const user=db.users.find(
+  }
 
-u=>
+  if (user.status === "blocked") {
 
-u.username===username &&
+    return res.json({
 
-u.password===password
+      success: false,
 
-);
+      message: "Account Suspended"
 
+    });
 
+  }
 
-if(!user){
+  const latestUser = {
 
-return res.json({
+    id: user.id,
 
-success:false,
+    username: user.username,
 
-message:"Invalid Username or Password"
+    coins: user.coins || 0,
 
-});
+    followers: user.followers || 0,
 
-}
+    likes: user.likes || 0,
 
+    trustScore: user.trustScore || 100,
 
+    tasksCompleted: user.tasksCompleted || 0,
 
+    status: user.status || "active"
 
-if(user.status==="blocked"){
+  };
 
+  res.json({
 
-return res.json({
+    success: true,
 
-success:false,
+    user: latestUser
 
-message:"Your account is suspended"
-
-});
-
-
-}
-
-
-
-
-
-res.json({
-
-success:true,
-
-user
-
-});
-
-
+  });
 
 });
 
-
-
-
-module.exports=router;
+module.exports = router;
