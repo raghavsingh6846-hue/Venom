@@ -5,27 +5,17 @@ const multer = require("multer");
 const router = express.Router();
 
 const DB="./db.json";
-
 const REQUEST_DB="./coin_requests.json";
-
 
 
 const storage = multer.diskStorage({
 
 destination:(req,file,cb)=>{
-
 cb(null,"uploads/");
-
 },
 
-
 filename:(req,file,cb)=>{
-
-cb(
-null,
-Date.now()+"-"+file.originalname
-);
-
+cb(null,Date.now()+"-"+file.originalname);
 }
 
 });
@@ -34,7 +24,6 @@ Date.now()+"-"+file.originalname
 const upload = multer({
 storage
 });
-
 
 
 
@@ -62,11 +51,8 @@ JSON.stringify(data,null,2)
 function loadRequests(){
 
 if(!fs.existsSync(REQUEST_DB)){
-
 return [];
-
 }
-
 
 return JSON.parse(
 fs.readFileSync(REQUEST_DB,"utf8")
@@ -88,10 +74,7 @@ JSON.stringify(data,null,2)
 
 
 
-
-
-
-// USER SEND PAYMENT SCREENSHOT
+// USER PAYMENT REQUEST
 
 router.post(
 "/request",
@@ -111,28 +94,44 @@ const requests=loadRequests();
 
 
 
-const request={
+const already = requests.find(
+r =>
+r.username===username &&
+r.packageName===packageName &&
+r.status==="Pending"
+);
 
+
+
+if(already){
+
+return res.json({
+
+success:false,
+
+message:"Payment Already Submitted"
+
+});
+
+}
+
+
+
+const request={
 
 id:Date.now(),
 
-
 username,
-
 
 packageName,
 
-
 amount:Number(amount),
-
 
 screenshot:req.file
 ? req.file.filename
 :"",
 
-
 status:"Pending",
-
 
 createdAt:new Date().toISOString()
 
@@ -141,7 +140,6 @@ createdAt:new Date().toISOString()
 
 
 requests.push(request);
-
 
 saveRequests(requests);
 
@@ -164,8 +162,7 @@ message:"Payment Submitted"
 
 
 
-
-// ADMIN GET PAYMENT REQUESTS
+// ADMIN GET REQUESTS
 
 router.get(
 "/requests",
@@ -173,7 +170,6 @@ router.get(
 
 
 const requests=loadRequests();
-
 
 
 res.json({
@@ -196,9 +192,7 @@ r=>r.status==="Pending"
 
 
 
-
-
-// APPROVE PAYMENT
+// ADMIN APPROVE
 
 router.post(
 "/approve",
@@ -208,8 +202,8 @@ router.post(
 const {id}=req.body;
 
 
-
 const requests=loadRequests();
+
 
 
 const request=requests.find(
@@ -230,6 +224,19 @@ message:"Request Not Found"
 
 }
 
+
+
+if(request.status==="Approved"){
+
+return res.json({
+
+success:false,
+
+message:"Already Approved"
+
+});
+
+}
 
 
 
@@ -258,30 +265,20 @@ message:"User Not Found"
 
 
 
-let coins=0;
+const coinsMap={
+
+"50 Coins":50,
+
+"100 Coins":100,
+
+"320 Coins":320
+
+};
 
 
 
-if(request.packageName==="50 Coins"){
-
-coins=50;
-
-}
-
-
-if(request.packageName==="100 Coins"){
-
-coins=100;
-
-}
-
-
-if(request.packageName==="320 Coins"){
-
-coins=320;
-
-}
-
+const coins =
+coinsMap[request.packageName] || 0;
 
 
 
@@ -304,7 +301,7 @@ res.json({
 
 success:true,
 
-message:"Coins Added"
+message:`${coins} Coins Added`
 
 });
 
@@ -318,9 +315,7 @@ message:"Coins Added"
 
 
 
-
-
-// REJECT PAYMENT
+// ADMIN REJECT
 
 router.post(
 "/reject",
@@ -328,6 +323,7 @@ router.post(
 
 
 const {id}=req.body;
+
 
 
 const requests=loadRequests();
@@ -344,15 +340,11 @@ if(request){
 
 request.status="Rejected";
 
-}
-
-
-
 saveRequests(requests);
 
 
 
-res.json({
+return res.json({
 
 success:true,
 
@@ -360,9 +352,20 @@ message:"Payment Rejected"
 
 });
 
+}
+
+
+
+res.json({
+
+success:false,
+
+message:"Request Not Found"
 
 });
 
+
+});
 
 
 

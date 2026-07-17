@@ -1,172 +1,252 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Preferences } from "@capacitor/preferences";
-import { Link } from "react-router-dom";
 
 const API = "https://venom-server-5dey.onrender.com";
 
-export default function MyOrders() {
 
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function MyOrders(){
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
+const [orders,setOrders]=useState([]);
+const [loading,setLoading]=useState(true);
 
-  async function loadOrders() {
 
-    try {
+useEffect(()=>{
+loadOrders();
+},[]);
 
-      const data = await Preferences.get({
-        key: "venomUser"
-      });
 
-      if (!data.value) {
-        setLoading(false);
-        return;
-      }
 
-      const user = JSON.parse(data.value);
+async function loadOrders(){
 
-      const res = await axios.get(
-        `${API}/orders/my/${user.username}`
-      );
+try{
 
-      if (res.data.success) {
-        setOrders(res.data.orders);
-      }
+const data = await Preferences.get({
+key:"venomUser"
+});
 
-    } catch (err) {
-      console.log(err);
-    }
 
-    setLoading(false);
+if(!data.value){
+setLoading(false);
+return;
+}
 
-  }
 
-  if (loading) {
-    return (
-      <div style={{
-        color: "white",
-        background: "#111",
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontSize: "22px"
-      }}>
-        Loading...
-      </div>
-    );
-  }
+const user = JSON.parse(data.value);
 
-  return (
 
-    <div style={{
-      background: "#111",
-      color: "white",
-      minHeight: "100vh",
-      padding: "20px",
-      fontFamily: "Arial"
-    }}>
 
-      <h1 style={{
-        textAlign: "center"
-      }}>
-        📦 My Orders
-      </h1>
+const res = await fetch(
+`${API}/orders/my/${user.username}`
+);
 
-      {
-        orders.length === 0 && (
 
-          <div style={{
-            textAlign: "center",
-            marginTop: "60px",
-            fontSize: "20px"
-          }}>
-            No Orders Found
-          </div>
 
-        )
-      }
+const result = await res.json();
 
-      {
-        orders.map(order => (
 
-          <div
-            key={order.id}
-            style={{
-              background: "#222",
-              padding: "20px",
-              borderRadius: "20px",
-              marginTop: "20px"
-            }}
-          >
 
-            <h2>{order.title}</h2>
+if(result.success){
 
-            <p>Task : {order.type}</p>
-
-            <p>Reward : 🪙 {order.reward}</p>
-
-            <p>Total Quantity : {order.quantity}</p>
-
-            <p>Completed : {order.completed}</p>
-
-            <p>Remaining : {order.remaining}</p>
-
-            <p>Coins Spent : {order.coinsSpent}</p>
-
-            <p>Status : {order.status}</p>
-
-            <div style={{
-              width: "100%",
-              height: "12px",
-              background: "#444",
-              borderRadius: "20px",
-              overflow: "hidden",
-              marginTop: "15px"
-            }}>
-
-              <div
-                style={{
-                  width:
-                    order.quantity === 0
-                      ? "100%"
-                      : `${(order.completed / order.quantity) * 100}%`,
-                  height: "100%",
-                  background: "#00c853"
-                }}
-              />
-
-            </div>
-
-          </div>
-
-        ))
-      }
-
-      <Link to="/home">
-
-        <button
-          style={{
-            width: "100%",
-            marginTop: "30px",
-            padding: "15px",
-            borderRadius: "20px",
-            border: "none",
-            fontSize: "18px",
-            fontWeight: "bold"
-          }}
-        >
-          ⬅ Back Home
-        </button>
-
-      </Link>
-
-    </div>
-
-  );
+setOrders(result.orders || []);
 
 }
+
+
+
+}catch(err){
+
+console.log(err);
+
+}
+
+
+setLoading(false);
+
+}
+
+
+
+
+return(
+
+<div style={page}>
+
+
+<h1>
+📦 My Orders
+</h1>
+
+
+
+<button
+style={button}
+onClick={loadOrders}
+>
+🔄 Refresh
+</button>
+
+
+
+{
+
+loading ?
+
+<h3>
+Loading...
+</h3>
+
+
+:
+
+
+orders.length===0 ?
+
+<h3>
+No Orders Found
+</h3>
+
+
+:
+
+
+orders.map(order=>(
+
+
+<div
+key={order.id}
+style={card}
+>
+
+
+<h2>
+{order.title || "Campaign"}
+</h2>
+
+
+<p>
+Type : {order.type}
+</p>
+
+
+<p>
+Reward : 🪙 {order.reward}
+</p>
+
+
+<p>
+Total Quantity : {order.quantity}
+</p>
+
+
+<p>
+Completed : {order.completed}
+</p>
+
+
+<p>
+Remaining : {order.remaining}
+</p>
+
+
+
+<div style={progressBox}>
+
+<div
+style={{
+...progress,
+width:
+order.quantity
+?
+`${Math.min(
+100,
+(order.completed/order.quantity)*100
+)}%`
+:
+"0%"
+}}
+>
+
+</div>
+
+</div>
+
+
+
+<p>
+Status : {order.status}
+</p>
+
+
+
+</div>
+
+
+))
+
+
+}
+
+
+
+</div>
+
+);
+
+
+}
+
+
+
+const page={
+
+minHeight:"100vh",
+padding:"20px",
+background:
+"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+color:"white",
+fontFamily:"Arial"
+
+};
+
+
+
+const card={
+
+background:"white",
+color:"#222",
+padding:"20px",
+borderRadius:"20px",
+marginTop:"15px"
+
+};
+
+
+
+const button={
+
+padding:"12px 20px",
+border:"none",
+borderRadius:"20px",
+fontWeight:"bold"
+
+};
+
+
+
+const progressBox={
+
+height:"12px",
+background:"#ddd",
+borderRadius:"20px",
+overflow:"hidden"
+
+};
+
+
+
+const progress={
+
+height:"100%",
+background:"#833ab4"
+
+};

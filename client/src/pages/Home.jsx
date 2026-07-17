@@ -1,192 +1,187 @@
-
 import { Link } from "react-router-dom";
-import { Preferences } from "@capacitor/preferences";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Preferences } from "@capacitor/preferences";
 
-const API="https://venom-server-5dey.onrender.com";
+const API = "https://venom-server-5dey.onrender.com";
 
-export default function Home(){
+export default function Home() {
 
-const [user,setUser]=useState(null);
+  const [user, setUser] = useState(null);
 
-useEffect(()=>{
+  useEffect(() => {
+    loadUser();
+  }, []);
 
-loadUser();
+  async function loadUser() {
 
-},[]);
+    const data = await Preferences.get({
+      key: "venomUser"
+    });
 
+    if (!data.value) return;
 
-async function loadUser(){
+    const localUser = JSON.parse(data.value);
 
-const data=await Preferences.get({
-key:"venomUser"
-});
+    try {
 
-if(!data.value) return;
+      const res = await axios.post(
+        `${API}/wallet/user`,
+        {
+          username: localUser.username
+        }
+      );
 
-const localUser=JSON.parse(data.value);
+      if (res.data.success) {
 
-try{
+        setUser(res.data.user);
 
-const res=await axios.get(
-`${API}/wallet/user/${localUser.username}`
-);
+        await Preferences.set({
+          key: "venomUser",
+          value: JSON.stringify(res.data.user)
+        });
 
-if(res.data.success){
+        localStorage.setItem(
+          "venomUser",
+          JSON.stringify(res.data.user)
+        );
 
-setUser(res.data.user);
+      }
 
-await Preferences.set({
-key:"venomUser",
-value:JSON.stringify(res.data.user)
-});
+    } catch (err) {
+      console.log(err);
+    }
 
-localStorage.setItem(
-"venomUser",
-JSON.stringify(res.data.user)
-);
+  }
 
-}
+  async function logout() {
 
-}catch{
+    await Preferences.remove({
+      key: "venomUser"
+    });
 
-setUser(localUser);
+    localStorage.removeItem("venomUser");
 
-}
+    window.location.href = "/";
 
-}
+  }
 
+  return (
 
-async function logout(){
+    <div style={page}>
 
-await Preferences.remove({
-key:"venomUser"
-});
+      <h1 style={title}>
+        Venom 🐍
+      </h1>
 
-localStorage.removeItem("venomUser");
+      <div style={profile}>
 
-window.location.href="/";
+        <h2>Welcome 👋</h2>
 
-}
+        <h2>
+          {user ? user.username : "Loading..."}
+        </h2>
 
-return(
+        <h1>
+          🪙 {user ? user.coins : 0}
+        </h1>
 
-<div style={page}>
+        <p>Your Coins</p>
 
-<h1 style={title}>
-Venom 🐍
-</h1>
+      </div>
 
-<div style={profile}>
+      <div style={menu}>
 
-<h2>Welcome 👋</h2>
+        <Link to="/tasks">
+          <button style={btn}>🚀 Available Tasks</button>
+        </Link>
 
-<h2>{user?user.username:"Guest"}</h2>
+        <Link to="/orders">
+          <button style={btn}>📦 My Orders</button>
+        </Link>
 
-<h1>🪙 {user?user.coins:0}</h1>
+        <Link to="/buycoins">
+          <button style={btn}>💎 Buy Coins</button>
+        </Link>
 
-<p>Available Coins</p>
+        <Link to="/campaign">
+          <button style={btn}>📢 Create Campaign</button>
+        </Link>
 
-</div>
+        <Link to="/leaderboard">
+          <button style={btn}>🏆 Leaderboard</button>
+        </Link>
 
-<div style={menu}>
+        <Link to="/admin-login">
+          <button style={adminBtn}>🔐 Admin Panel</button>
+        </Link>
 
-<Link to="/tasks">
-<button style={btn}>
-🚀 Available Tasks
-</button>
-</Link>
+        <button
+          style={btn}
+          onClick={loadUser}
+        >
+          🔄 Refresh Coins
+        </button>
 
-<Link to="/orders">
-<button style={btn}>
-📦 My Orders
-</button>
-</Link>
+        <button
+          style={btn}
+          onClick={logout}
+        >
+          🚪 Logout
+        </button>
 
-<Link to="/buycoins">
-<button style={btn}>
-💎 Buy Coins
-</button>
-</Link>
+      </div>
 
-<Link to="/campaign">
-<button style={btn}>
-📢 Create Campaign
-</button>
-</Link>
+    </div>
 
-<Link to="/leaderboard">
-<button style={btn}>
-🏆 Leaderboard
-</button>
-</Link>
-
-<Link to="/admin-login">
-<button style={adminBtn}>
-🔐 Admin Panel
-</button>
-</Link>
-
-<button
-style={btn}
-onClick={logout}
->
-🚪 Logout
-</button>
-
-</div>
-
-</div>
-
-);
+  );
 
 }
 
-const page={
-minHeight:"100vh",
-padding:"25px",
-textAlign:"center",
-background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
-color:"white",
-fontFamily:"Arial"
+const page = {
+  minHeight: "100vh",
+  padding: "25px",
+  textAlign: "center",
+  background: "linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+  color: "white",
+  fontFamily: "Arial"
 };
 
-const title={
-fontSize:"42px"
+const title = {
+  fontSize: "42px"
 };
 
-const profile={
-background:"rgba(255,255,255,0.15)",
-backdropFilter:"blur(12px)",
-borderRadius:"30px",
-padding:"30px",
-marginBottom:"30px"
+const profile = {
+  background: "rgba(255,255,255,0.15)",
+  backdropFilter: "blur(12px)",
+  borderRadius: "30px",
+  padding: "30px",
+  marginBottom: "30px"
 };
 
-const menu={
-display:"grid",
-gap:"15px"
+const menu = {
+  display: "grid",
+  gap: "15px"
 };
 
-const btn={
-width:"100%",
-padding:"16px",
-borderRadius:"20px",
-border:"none",
-background:"white",
-color:"#833ab4",
-fontSize:"18px",
-fontWeight:"bold"
+const btn = {
+  width: "100%",
+  padding: "16px",
+  borderRadius: "20px",
+  border: "none",
+  background: "white",
+  color: "#833ab4",
+  fontSize: "18px",
+  fontWeight: "bold"
 };
 
-const adminBtn={
-width:"100%",
-padding:"16px",
-borderRadius:"20px",
-border:"none",
-background:"#111",
-color:"white",
-fontSize:"18px",
-fontWeight:"bold"
+const adminBtn = {
+  width: "100%",
+  padding: "16px",
+  borderRadius: "20px",
+  border: "none",
+  background: "#111",
+  color: "white",
+  fontSize: "18px",
+  fontWeight: "bold"
 };

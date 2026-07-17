@@ -49,7 +49,7 @@ JSON.stringify(data,null,2)
 
 
 
-// USER UPLOAD TASK SCREENSHOT
+// USER UPLOAD PROOF
 
 router.post(
 "/upload",
@@ -64,12 +64,42 @@ type
 }=req.body;
 
 
+
 const db=loadDB();
 
 
+
 if(!db.proofs){
+
 db.proofs=[];
+
 }
+
+
+
+// duplicate check
+
+const already=db.proofs.find(
+p =>
+p.username===username &&
+p.campaignId==campaignId &&
+p.status==="Pending"
+);
+
+
+
+if(already){
+
+return res.json({
+
+success:false,
+
+message:"Proof Already Submitted"
+
+});
+
+}
+
 
 
 
@@ -79,11 +109,15 @@ let reward=0;
 if(type==="Like")
 reward=1;
 
+
 if(type==="Follow")
 reward=2;
 
+
 if(type==="Comment")
 reward=3;
+
+
 
 
 
@@ -100,8 +134,10 @@ type,
 reward,
 
 screenshot:req.file
-? req.file.filename
-:"",
+?
+req.file.filename
+:
+"",
 
 status:"Pending",
 
@@ -135,7 +171,7 @@ message:"Screenshot Submitted"
 
 
 
-// ADMIN PENDING PROOFS
+// ADMIN PENDING
 
 router.get(
 "/pending",
@@ -149,7 +185,7 @@ res.json({
 
 success:true,
 
-proofs:(db.proofs || []).filter(
+proofs:(db.proofs||[]).filter(
 p=>p.status==="Pending"
 )
 
@@ -157,6 +193,7 @@ p=>p.status==="Pending"
 
 
 });
+
 
 
 
@@ -172,6 +209,7 @@ router.post(
 
 
 const {id}=req.body;
+
 
 
 const db=loadDB();
@@ -198,6 +236,22 @@ message:"Proof Not Found"
 
 
 
+if(proof.status==="Approved"){
+
+return res.json({
+
+success:false,
+
+message:"Already Approved"
+
+});
+
+}
+
+
+
+
+
 const user=db.users.find(
 u=>u.username===proof.username
 );
@@ -208,20 +262,18 @@ if(user){
 
 
 user.coins =
-(user.coins || 0)+proof.reward;
+(user.coins||0)+proof.reward;
 
 
 user.tasksCompleted =
-(user.tasksCompleted || 0)+1;
+(user.tasksCompleted||0)+1;
 
 
 user.trustScore =
-(user.trustScore || 100)+1;
+(user.trustScore||100)+1;
 
 
 }
-
-
 
 
 
@@ -235,8 +287,7 @@ c=>c.id==proof.campaignId
 if(campaign){
 
 
-campaign.quantity =
-Math.max(
+campaign.quantity=Math.max(
 0,
 campaign.quantity-1
 );
@@ -251,17 +302,16 @@ campaign.completed=[];
 
 
 
-if(
-!campaign.completed.includes(
+if(!campaign.completed.includes(
 proof.username
-)
-){
+)){
 
 campaign.completed.push(
 proof.username
 );
 
 }
+
 
 
 if(campaign.quantity===0){
@@ -275,10 +325,8 @@ campaign.status="Completed";
 
 
 
-
-
-
 proof.status="Approved";
+
 
 
 saveDB(db);
@@ -314,6 +362,7 @@ router.post(
 const {id}=req.body;
 
 
+
 const db=loadDB();
 
 
@@ -338,23 +387,8 @@ message:"Proof Not Found"
 
 
 
-
-const user=db.users.find(
-u=>u.username===proof.username
-);
-
-
-
-if(user){
-
-user.trustScore =
-(user.trustScore || 100)-1;
-
-}
-
-
-
 proof.status="Rejected";
+
 
 
 saveDB(db);

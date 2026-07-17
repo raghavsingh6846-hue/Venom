@@ -28,9 +28,7 @@ JSON.stringify(data,null,2)
 
 
 
-
-
-// USER VIEW ACTIVE CAMPAIGNS
+// USER VIEW CAMPAIGNS
 
 router.get(
 "/",
@@ -40,13 +38,27 @@ router.get(
 const db=loadDB();
 
 
+const campaigns=(db.campaigns||[])
+.filter(c=>c.status==="Active")
+.map(c=>({
+
+id:c.id,
+type:c.type,
+title:c.title,
+link:c.link,
+reward:c.reward,
+quantity:c.quantity,
+commentText:c.commentText || ""
+
+}));
+
+
+
 res.json({
 
 success:true,
 
-campaigns:(db.campaigns || []).filter(
-c=>c.status==="Active"
-)
+campaigns
 
 });
 
@@ -60,9 +72,7 @@ c=>c.status==="Active"
 
 
 
-
-
-// CREATE CAMPAIGN / ORDER
+// CREATE CAMPAIGN
 
 router.post(
 "/create",
@@ -104,6 +114,25 @@ message:"User Not Found"
 
 
 
+const qty=Number(quantity);
+
+
+
+if(!qty || qty<=0){
+
+return res.json({
+
+success:false,
+
+message:"Invalid Quantity"
+
+});
+
+}
+
+
+
+
 
 let reward=0;
 
@@ -121,10 +150,7 @@ reward=3;
 
 
 
-
-
-const totalCoins =
-reward * Number(quantity);
+const totalCoins=reward*qty;
 
 
 
@@ -143,51 +169,35 @@ message:"Insufficient Coins"
 
 
 
-user.coins -= totalCoins;
-
-
-
+user.coins-=totalCoins;
 
 
 
 const campaign={
 
-
 id:Date.now(),
-
 
 username,
 
-
 type,
-
 
 title:type+" Task",
 
-
 link,
-
 
 reward,
 
-
-quantity:Number(quantity),
-
+quantity:qty,
 
 commentText:commentText || "",
 
-
 completed:[],
-
 
 status:"Active",
 
-
 createdAt:new Date().toISOString()
 
-
 };
-
 
 
 
@@ -202,7 +212,6 @@ db.campaigns=[];
 db.campaigns.push(campaign);
 
 
-
 saveDB(db);
 
 
@@ -212,8 +221,6 @@ res.json({
 success:true,
 
 message:"Campaign Created",
-
-campaign,
 
 coins:user.coins
 
@@ -229,11 +236,7 @@ coins:user.coins
 
 
 
-
-
-
-
-// ADMIN ALL CAMPAIGNS
+// ADMIN ALL
 
 router.get(
 "/admin/all",
@@ -241,6 +244,7 @@ router.get(
 
 
 const db=loadDB();
+
 
 
 res.json({
@@ -261,11 +265,7 @@ campaigns:db.campaigns || []
 
 
 
-
-
-
-
-// ADMIN DELETE CAMPAIGN
+// ADMIN DELETE
 
 router.post(
 "/admin/delete",
@@ -299,7 +299,6 @@ message:"Campaign Not Found"
 
 
 
-
 db.campaigns.splice(index,1);
 
 
@@ -318,7 +317,6 @@ message:"Campaign Deleted"
 
 
 });
-
 
 
 

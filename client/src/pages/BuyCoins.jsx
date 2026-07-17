@@ -4,13 +4,20 @@ import { Link } from "react-router-dom";
 
 const API="https://venom-server-5dey.onrender.com";
 
+
 export default function BuyCoins(){
 
-const user=JSON.parse(localStorage.getItem("venomUser"));
+const user=JSON.parse(
+localStorage.getItem("venomUser")
+);
+
 
 const [selected,setSelected]=useState("");
 const [amount,setAmount]=useState("");
 const [screenshot,setScreenshot]=useState(null);
+const [loading,setLoading]=useState(false);
+
+
 
 const packages=[
 {name:"50 Coins",price:30},
@@ -19,35 +26,69 @@ const packages=[
 ];
 
 
+
+
+
 async function submitRequest(){
 
-if(!selected){
-alert("Select Package");
+
+if(loading){
 return;
 }
 
+
+
+if(!selected){
+
+alert("Select Package");
+return;
+
+}
+
+
+
 if(!screenshot){
+
 alert("Upload Payment Screenshot");
 return;
+
 }
+
+
+
+if(!user){
+
+alert("Login Required");
+return;
+
+}
+
+
+
+setLoading(true);
+
 
 
 const formData=new FormData();
+
 
 formData.append(
 "username",
 user.username
 );
 
+
 formData.append(
 "packageName",
 selected
 );
 
+
 formData.append(
 "amount",
 amount
 );
+
 
 formData.append(
 "screenshot",
@@ -56,21 +97,31 @@ screenshot
 
 
 
+
 try{
 
 
 const res=await axios.post(
+
 `${API}/coins/request`,
+
 formData,
+
 {
+
 headers:{
 "Content-Type":"multipart/form-data"
 }
+
 }
+
 );
 
 
+
 alert(res.data.message);
+
+
 
 setSelected("");
 setAmount("");
@@ -81,24 +132,27 @@ setScreenshot(null);
 }catch(err){
 
 console.log(err);
+
 alert("Server Error");
 
+
 }
 
 
+
+setLoading(false);
+
+
 }
+
+
 
 
 
 return(
 
-<div style={{
-minHeight:"100vh",
-padding:"20px",
-background:"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
-fontFamily:"Arial",
-color:"white"
-}}>
+
+<div style={page}>
 
 
 <h1 style={{textAlign:"center"}}>
@@ -107,21 +161,22 @@ color:"white"
 
 
 
-<div style={{
-background:"rgba(255,255,255,.15)",
-padding:"20px",
-borderRadius:"25px"
-}}>
+<div style={box}>
 
 
 <h2>Select Package</h2>
 
 
+
 {
+
 packages.map((p)=>(
 
+
 <button
+
 key={p.name}
+
 onClick={()=>{
 
 setSelected(p.name);
@@ -131,11 +186,7 @@ setAmount(p.price);
 
 style={{
 
-width:"100%",
-padding:"16px",
-marginTop:"12px",
-borderRadius:"20px",
-border:"none",
+...packageBtn,
 
 background:
 selected===p.name
@@ -149,10 +200,7 @@ selected===p.name
 ?
 "white"
 :
-"black",
-
-fontSize:"18px",
-fontWeight:"bold"
+"black"
 
 }}
 
@@ -162,7 +210,10 @@ fontWeight:"bold"
 
 </button>
 
+
 ))
+
+
 }
 
 
@@ -172,16 +223,7 @@ fontWeight:"bold"
 
 
 
-
-<div style={{
-
-marginTop:"25px",
-background:"rgba(255,255,255,.15)",
-padding:"20px",
-borderRadius:"25px",
-textAlign:"center"
-
-}}>
+<div style={box}>
 
 
 <h2>
@@ -190,30 +232,14 @@ Pay Using UPI
 
 
 <h3>
-UPI ID
+shivansh225@ptyes
 </h3>
 
 
-<div style={{
-
-background:"white",
-color:"black",
-padding:"15px",
-borderRadius:"15px",
-fontWeight:"bold",
-fontSize:"20px"
-
-}}>
-
-shivansh225@ptyes
-
-</div>
-
-
-
 <p>
-After Payment Upload Screenshot
+Payment ke baad screenshot upload karo
 </p>
+
 
 
 <input
@@ -223,52 +249,52 @@ type="file"
 accept="image/*"
 
 onChange={(e)=>
-setScreenshot(e.target.files[0])
+setScreenshot(
+e.target.files[0]
+)
 }
 
 />
 
 
+
 <br/><br/>
+
 
 
 <button
 
+disabled={loading}
+
 onClick={submitRequest}
 
-style={{
-
-padding:"15px 40px",
-borderRadius:"25px",
-border:"none",
-fontSize:"18px",
-fontWeight:"bold"
-
-}}
+style={submitBtn}
 
 >
 
-Submit Payment
+{
+
+loading
+?
+"Submitting..."
+:
+"Submit Payment"
+
+}
+
 
 </button>
+
 
 
 </div>
 
 
 
+
 <Link to="/home">
 
-<button style={{
-
-marginTop:"25px",
-width:"100%",
-padding:"16px",
-borderRadius:"20px",
-border:"none",
-fontWeight:"bold"
-
-}}>
+<button style={backBtn}>
 
 ⬅ Back Home
 
@@ -277,9 +303,75 @@ fontWeight:"bold"
 </Link>
 
 
+
 </div>
+
 
 );
 
 
 }
+
+
+
+
+
+const page={
+
+minHeight:"100vh",
+padding:"20px",
+background:
+"linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)",
+color:"white",
+fontFamily:"Arial"
+
+};
+
+
+
+const box={
+
+background:"rgba(255,255,255,.15)",
+padding:"20px",
+borderRadius:"25px",
+marginBottom:"20px"
+
+};
+
+
+
+const packageBtn={
+
+width:"100%",
+padding:"16px",
+marginTop:"12px",
+borderRadius:"20px",
+border:"none",
+fontSize:"18px",
+fontWeight:"bold"
+
+};
+
+
+
+const submitBtn={
+
+padding:"15px 40px",
+borderRadius:"25px",
+border:"none",
+fontSize:"18px",
+fontWeight:"bold"
+
+};
+
+
+
+const backBtn={
+
+width:"100%",
+padding:"16px",
+borderRadius:"20px",
+border:"none",
+fontWeight:"bold"
+
+};
