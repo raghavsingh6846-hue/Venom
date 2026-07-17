@@ -20,9 +20,9 @@ const [loading,setLoading]=useState(false);
 
 
 const packages=[
-{name:"50 Coins",price:30},
-{name:"100 Coins",price:50},
-{name:"320 Coins",price:150}
+{name:"70 Coins",price:20},
+{name:"180 Coins",price:50},
+{name:"400 Coins",price:100}
 ];
 
 

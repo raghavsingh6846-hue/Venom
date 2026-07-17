@@ -120,6 +120,16 @@ export default function Login(){
           </button>
         </Link>
 
+<p
+  style={{
+    marginTop:"20px",
+    fontSize:"13px",
+    opacity:0.8
+  }}
+>
+  Developed by <b>Venom</b>
+</p>
+
       </div>
 
     </div>

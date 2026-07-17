@@ -7,7 +7,10 @@ const API = "https://venom-server-5dey.onrender.com";
 
 export default function Home() {
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({
+    username: "Loading...",
+    coins: 0
+  });
 
   useEffect(() => {
     loadUser();
@@ -49,7 +52,9 @@ export default function Home() {
       }
 
     } catch (err) {
+
       console.log(err);
+
     }
 
   }
@@ -78,13 +83,9 @@ export default function Home() {
 
         <h2>Welcome 👋</h2>
 
-        <h2>
-          {user ? user.username : "Loading..."}
-        </h2>
+        <h2>{user.username}</h2>
 
-        <h1>
-          🪙 {user ? user.coins : 0}
-        </h1>
+        <h1>🪙 {user.coins}</h1>
 
         <p>Your Coins</p>
 
@@ -129,6 +130,16 @@ export default function Home() {
         >
           🚪 Logout
         </button>
+
+        <p
+          style={{
+            marginTop: "12px",
+            fontSize: "13px",
+            opacity: 0.8
+          }}
+        >
+          Developed by <b>Venom</b>
+        </p>
 
       </div>
 
