@@ -55,15 +55,16 @@ console.log(err);
 
 async function deleteUser(id){
 
-
+if(!window.confirm("Delete this user permanently?")){
+return;
+}
 
 try{
 
-const res=await axios.post(
+const res = await axios.post(
 `${API}/admin/delete-user`,
 {id}
 );
-
 
 alert(res.data.message);
 
@@ -74,9 +75,11 @@ loadUsers();
 console.log(err);
 
 if(err.response){
-  alert(JSON.stringify(err.response.data));
+alert(JSON.stringify(err.response.data));
 }else{
-  alert(err.message);
+alert(err.message);
+}
+
 }
 
 }
@@ -467,4 +470,4 @@ border:"none",
 marginTop:"20px"
 
 };
-}
+
