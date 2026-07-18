@@ -55,8 +55,6 @@ console.log(err);
 
 async function deleteUser(id){
 
-if(!confirm("Delete this user permanently?"))
-return;
 
 
 try{
@@ -71,11 +69,14 @@ alert(res.data.message);
 
 loadUsers();
 
+}catch(err){
 
-}catch{
+console.log(err);
 
-alert("Server Error");
-
+if(err.response){
+  alert(JSON.stringify(err.response.data));
+}else{
+  alert(err.message);
 }
 
 }
@@ -466,3 +467,4 @@ border:"none",
 marginTop:"20px"
 
 };
+}
